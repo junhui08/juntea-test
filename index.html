@@ -497,7 +497,7 @@ var I18N={
     msgNoPerm:'权限不足：仅管理员可访问后台',msgNeedLogin:'请先登录',msgUserNotFound:'用户不存在',
     msgRegisterOk:'注册成功！\n\n你的名字：',msgRegisterOk2:'\n你的 ID：',msgRegisterOk3:'\n\n以后请用名字 + 首次设置的密码登录。\n注意：密码忘记将无法找回账号。',
     tClickStart:'点击开始',tWaitGreen:'等待绿色',tGreenNow:'变绿后立即点击',tClickNow:'点击',tTooEarly:'过早点击',tClickRetry:'点击重试',
-    tDone:'完成',tAvg:'平均',tWaitBeep:'等待提示音',tHearBeep:'听到"嘀"声后立即点击',tWait:'等待...',
+    tDone:'完成',tAvg:'平均',tWaitBeep:'等待提示音',tListen:'仔细听',tHearBeep:'听到"嘀"声后立即点击',tWait:'等待...',
     tObserve:'观察序列',tStep:'步',tReproduce:'请复现顺序',tError:'错误！最高',tStep2:'步',tCorrectNext:'正确！下一轮...',
     tRememberNum:'记住数字',tInputNum:'请输入刚才的数字',tDigits:'位',tWrongNum:'错误！正确是',tMaxDigits:'最高',
     tFindDiff:'限时内找出颜色不同的方块',tWrongOne:'点错了，再试第',tLevel:'关',tReachLv:'完成！到达第',
@@ -552,7 +552,7 @@ var I18N={
     msgNoPerm:'Access denied: admin only',msgNeedLogin:'Please log in first',msgUserNotFound:'User not found',
     msgRegisterOk:'Registration successful!\n\nYour name: ',msgRegisterOk2:'\nYour ID: ',msgRegisterOk3:'\n\nUse name + password to log in next time.\nWarning: password cannot be recovered.',
     tClickStart:'Click to start',tWaitGreen:'Wait for green',tGreenNow:'Click when green',tClickNow:'CLICK',tTooEarly:'Too early',tClickRetry:'Click to retry',
-    tDone:'Done',tAvg:'Avg',tWaitBeep:'Wait for beep',tHearBeep:'Click when you hear the beep',tWait:'Waiting...',
+    tDone:'Done',tAvg:'Avg',tWaitBeep:'Wait for beep',tListen:'Listen carefully',tHearBeep:'Click when you hear the beep',tWait:'Waiting...',
     tObserve:'Watch sequence',tStep:'steps',tReproduce:'Reproduce the order',tError:'Wrong! Max',tStep2:'steps',tCorrectNext:'Correct! Next...',
     tRememberNum:'Remember the number',tInputNum:'Enter the number shown',tDigits:'digits',tWrongNum:'Wrong! Answer was',tMaxDigits:'Max',
     tFindDiff:'Find the odd color in time',tWrongOne:'Wrong, retry level',tLevel:'',tReachLv:'Done! Reached level',
@@ -606,7 +606,7 @@ var I18N={
     msgNoPerm:'権限不足：管理者専用',msgNeedLogin:'先にログインしてください',msgUserNotFound:'ユーザーが見つかりません',
     msgRegisterOk:'登録成功！\n\n名前：',msgRegisterOk2:'\nID：',msgRegisterOk3:'\n\n次回は名前+パスワードでログインしてください。\n注意：パスワードは復元できません。',
     tClickStart:'クリックで開始',tWaitGreen:'緑を待つ',tGreenNow:'緑になったらクリック',tClickNow:'クリック',tTooEarly:'早すぎ',tClickRetry:'再試行',
-    tDone:'完了',tAvg:'平均',tWaitBeep:'ビープを待つ',tHearBeep:'「ピッ」が聞こえたらクリック',tWait:'待機中...',
+    tDone:'完了',tAvg:'平均',tWaitBeep:'ビープを待つ',tListen:'よく聞いて',tHearBeep:'「ピッ」が聞こえたらクリック',tWait:'待機中...',
     tObserve:'順序を記憶',tStep:'ステップ',tReproduce:'順序を再現',tError:'間違い！最大',tStep2:'ステップ',tCorrectNext:'正解！次へ...',
     tRememberNum:'数字を記憶',tInputNum:'数字を入力',tDigits:'桁',tWrongNum:'間違い！正解は',tMaxDigits:'最大',
     tFindDiff:'違う色を時間内に探す',tWrongOne:'間違い、レベル',tLevel:'再試行',tReachLv:'完了！レベル',
@@ -660,7 +660,7 @@ var I18N={
     msgNoPerm:'권한 부족: 관리자 전용',msgNeedLogin:'먼저 로그인하세요',msgUserNotFound:'사용자를 찾을 수 없습니다',
     msgRegisterOk:'등록 성공!\n\n이름: ',msgRegisterOk2:'\nID: ',msgRegisterOk3:'\n\n다음에는 이름+비밀번호로 로그인하세요.\n주의: 비밀번호는 복구할 수 없습니다.',
     tClickStart:'클릭하여 시작',tWaitGreen:'녹색을 기다리세요',tGreenNow:'녹색이 되면 클릭',tClickNow:'클릭',tTooEarly:'너무 빨리',tClickRetry:'다시 시도',
-    tDone:'완료',tAvg:'평균',tWaitBeep:'비프 대기',tHearBeep:'비프음이 들리면 클릭',tWait:'대기 중...',
+    tDone:'완료',tAvg:'평균',tWaitBeep:'비프 대기',tListen:'잘 들으세요',tHearBeep:'비프음이 들리면 클릭',tWait:'대기 중...',
     tObserve:'순서 관찰',tStep:'단계',tReproduce:'순서를 재현하세요',tError:'오류! 최고',tStep2:'단계',tCorrectNext:'정답! 다음...',
     tRememberNum:'숫자 기억',tInputNum:'숫자를 입력하세요',tDigits:'자리',tWrongNum:'오류! 정답은',tMaxDigits:'최고',
     tFindDiff:'다른 색을 찾으세요',tWrongOne:'틀렸습니다, 레벨',tLevel:'재시도',tReachLv:'완료! 레벨',
@@ -1196,7 +1196,7 @@ function renderLeaderboardHtml(groups,hid){
 
     var line1='<div class="lb-line1">'+
       '<span class="lb-rank">#'+(index+1)+'</span>'+
-      '<span class="lb-name">'+star+escapeHtml(g.name)+'<span class="uid">#'+escapeHtml(g.userId)+'</span>'+(cnt>1?'<span class="cnt">'+cnt+t('timesSuffix')+'</span>':'')+'</span>'+
+      '<span class="lb-name">'+escapeHtml(g.name)+star+'<span class="uid">#'+escapeHtml(g.userId)+'</span>'+(cnt>1?'<span class="cnt">'+cnt+t('timesSuffix')+'</span>':'')+'</span>'+
       (gear?'<span class="lb-gear">'+escapeHtml(gear)+'</span>':'')+
       '<span class="lb-latest">'+
         '<span class="tag">'+t('lbLatest')+'</span>'+
@@ -1576,8 +1576,8 @@ TESTS.sound={start:function(area,finish){
   var panel=makeTestPanel('',t('tClickStart'),p.trials+' '+t('tTimesCount'));area.appendChild(panel);
   function ensureAudio(){if(!state.audioCtx){try{state.audioCtx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}if(state.audioCtx&&state.audioCtx.state==='suspended')state.audioCtx.resume();}
   function beep(){if(!state.audioCtx)return;var o=state.audioCtx.createOscillator(),g=state.audioCtx.createGain();o.type='sine';o.frequency.value=880;g.gain.value=0.15;o.connect(g);g.connect(state.audioCtx.destination);o.start();o.stop(state.audioCtx.currentTime+0.12);}
-  function next(){state.mode='waiting';panel.className='test-panel w';panel.querySelector('.mt').textContent=t('tWaitBeep');panel.querySelector('.st').textContent=t('tHearBeep');
-    state.timer=setTimeout(function(){state.mode='ready';beep();panel.className='test-panel r';panel.querySelector('.mt').textContent=t('tClickNow');panel.querySelector('.st').textContent='';state.startT=performance.now();},p.delayMin+Math.random()*(p.delayMax-p.delayMin));}
+    function next(){state.mode='waiting';panel.className='test-panel r';panel.querySelector('.mt').textContent=t('tListen');panel.querySelector('.st').textContent=t('tHearBeep');
+    state.timer=setTimeout(function(){state.mode='ready';beep();state.startT=performance.now();},p.delayMin+Math.random()*(p.delayMax-p.delayMin));}
   function handler(e){
     if(e.pointerType==='mouse'&&e.button!==0)return;ensureAudio();
     if(state.mode==='idle'){next();return;}
