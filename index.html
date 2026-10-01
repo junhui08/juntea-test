@@ -158,6 +158,33 @@ body{font-family:"JetBrains Mono","SF Mono",Consolas,"Courier New",monospace;bac
 .lb-group.is-admin .lb-history-item{border-color:#3a1f5c}
 .lb-group.is-admin .lb-history-item.is-best{border-color:#a855f7;background:rgba(168,85,247,.06)}
 .lb-empty{padding:24px;text-align:center;font-size:12px;color:#444;letter-spacing:.15em}
+.profile-header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #1e1e1e;padding-bottom:16px;margin-bottom:20px;gap:12px}
+.profile-name{font-size:22px;font-weight:800;color:#e8e8e8;letter-spacing:.05em}
+.profile-id{font-size:11px;color:#555;margin-top:4px;letter-spacing:.1em}
+.profile-id .star{color:#a855f7;margin-right:4px}
+.profile-close{background:none;border:1px solid #262626;color:#888;font-family:inherit;font-size:12px;padding:6px 12px;cursor:pointer;letter-spacing:.1em}
+.profile-close:hover{color:#ff5252;border-color:#3a1010}
+.profile-section{margin-bottom:20px}
+.profile-section-label{font-size:10px;color:#555;letter-spacing:.2em;margin-bottom:8px}
+.profile-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#1e1e1e;border:1px solid #1e1e1e;margin-bottom:20px}
+.profile-stat{padding:14px;background:#111}
+.profile-stat-label{font-size:10px;color:#555;margin-bottom:6px;letter-spacing:.1em}
+.profile-stat-value{font-size:22px;font-weight:800;color:#e8e8e8}
+.profile-stat-value.hl{color:#00ffff}
+.profile-text{font-size:13px;color:#aaa;line-height:1.7;letter-spacing:.02em;white-space:pre-wrap;word-break:break-word;min-height:22px;font-family:'Microsoft YaHei','PingFang SC','Noto Sans SC',sans-serif}
+.profile-text.empty{color:#444;font-style:italic}
+.profile-edit-input,.profile-edit-textarea{width:100%;padding:10px 12px;background:#0a0a0a;border:1px solid #262626;color:#e8e8e8;font-family:'Microsoft YaHei','PingFang SC','Noto Sans SC',sans-serif;font-size:13px;outline:none;line-height:1.6}
+.profile-edit-input:focus,.profile-edit-textarea:focus{border-color:#00ffff}
+.profile-edit-textarea{resize:vertical;min-height:60px}
+.profile-actions{display:flex;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid #1e1e1e}
+.profile-actions .btn{flex:1}
+.profile-history-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#0d0d0d;border:1px solid #1a1a1a;margin-bottom:4px;font-size:12px}
+.profile-history-item .ph-score{color:#00ffff;font-weight:700;min-width:36px}
+.profile-history-item .ph-rank{font-weight:700;min-width:24px;text-align:center}
+.profile-history-item .ph-time{color:#555;font-size:11px;margin-left:auto}
+.lb-name{cursor:pointer}
+.lb-name:hover{color:#00ffff !important}
+.lb-name:hover .star{color:#c084fc !important}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;justify-content:center;align-items:center;z-index:9999;padding:20px}
 .modal{background:#111;border:1px solid #262626;padding:24px;max-width:900px;width:100%;max-height:90vh;overflow-y:auto}
 .modal-title{font-size:13px;font-weight:700;letter-spacing:.25em;color:#00ffff;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #1e1e1e;display:flex;justify-content:space-between;align-items:center}
@@ -701,8 +728,8 @@ function enterMain(){
   showGridView();
   fetchCloudLeaderboard();
 }
-function renderUserChip(){if(!currentUser)return;var cls=currentUser.isAdmin?'user-chip admin':'user-chip';var star=currentUser.isAdmin?'<span class="star">★</span>':'';userChip.className=cls;userChip.innerHTML=star+'<span>'+escapeHtml(currentUser.name)+'</span><span class="uid">#'+escapeHtml(currentUser.id)+'</span>';userChip.style.display='inline-flex';}
-function doLogout(){if(!confirm('确认登出'))return;localStorage.removeItem(CONFIG.currentUserKey);currentUser=null;userChip.style.display='none';renderLogin();}
+  function renderUserChip(){if(!currentUser)return;var cls=currentUser.isAdmin?'user-chip admin':'user-chip';var star=currentUser.isAdmin?'<span class="star">★</span>':'';userChip.className=cls;userChip.innerHTML=star+'<span>'+escapeHtml(currentUser.name)+'</span><span class="uid">#'+escapeHtml(currentUser.id)+'</span>';userChip.style.display='inline-flex';userChip.style.cursor='pointer';userChip.title='点击查看个人主页';}
+  function doLogout(){if(!confirm('确认登出'))return;localStorage.removeItem(CONFIG.currentUserKey);currentUser=null;userChip.style.display='none';renderLogin();}
 
 var registerBtnLock=false;
 btnUserRegister.addEventListener('click',async function(){
@@ -729,6 +756,7 @@ userLoginName.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preve
 userLoginKey.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();var c=document.getElementById('adminModeCheck');if(c&&c.checked){doAdminLoginInline();}else{var r=document.querySelector('.login-tab[data-tab="register"]');if(r&&r.classList.contains('active')){btnUserRegister.click();}else{doUserLogin();}}}});adminLoginName.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();adminLoginKey.focus();}});
 adminLoginKey.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doAdminLogin();}});
 btnLogout.addEventListener('click',doLogout);
+userChip.addEventListener('click',openSelfProfile);
 
 async function fetchCloudLeaderboard(){
   leaderboardBody.innerHTML='<div class="lb-empty">加载中...</div>';
@@ -809,6 +837,14 @@ function renderLeaderboardHtml(groups,hid){
 function applyLeaderboardOpenState(){if(leaderboardOpen){leaderboardBody.classList.remove('collapsed');leaderboardToggle.textContent='收起 ▴';}else{leaderboardBody.classList.add('collapsed');leaderboardToggle.textContent='展开 ▾';}}
 leaderboardHeader.addEventListener('click',function(){leaderboardOpen=!leaderboardOpen;applyLeaderboardOpenState();});
 leaderboardBody.addEventListener('click',function(e){
+  var nameEl=e.target.closest?e.target.closest('.lb-name'):null;
+  if(nameEl){
+    var rowFromName=nameEl.closest('.lb-row');
+    if(rowFromName){
+      var openUid=rowFromName.getAttribute('data-uid');
+      if(openUid){openProfile(openUid);return;}
+    }
+  }
   var row=e.target.closest?e.target.closest('.lb-row'):null;
   if(!row)return;
   var uid=row.getAttribute('data-uid');
@@ -1301,6 +1337,163 @@ async function renderUsersTab(){
   document.getElementById('btnUsersClose').addEventListener('click',closeModal);
   slot.querySelectorAll('[data-del-user]').forEach(function(b){b.addEventListener('click',async function(){var id=this.getAttribute('data-del-user');if(!confirm('删除该用户？该用户的成绩不会自动删除。'))return;var r=await supabase.from('users').delete().eq('id',id);if(r.error){alert(r.error.message);return;}renderUsersTab();});});
 }
+  /* ========== 个人主页 ========== */
+async function openProfile(userId){
+  if(!userId){showToast('用户不存在');return;}
+  modalOverlay.style.display='flex';
+  modalBox.innerHTML='<div class="modal-title"><span>用户主页</span><span class="modal-sub">LOADING</span></div><div class="lb-empty">加载中...</div>';
+
+  var isSelf=currentUser&&currentUser.id===userId;
+  var userInfo=null;
+  var scores=[];
+
+  try{
+    var res=await supabase.from('users').select('*').eq('id',userId).limit(1);
+    if(res.data&&res.data.length>0)userInfo=res.data[0];
+  }catch(e){}
+  if(!userInfo&&userId===DEFAULT_ADMIN_ID){
+    userInfo={id:DEFAULT_ADMIN_ID,name:DEFAULT_ADMIN_NAME,is_admin:true,bio:'',gear:''};
+  }
+  if(!userInfo){
+    modalBox.innerHTML='<div class="modal-title"><span>用户主页</span><button class="profile-close" onclick="closeModal()">关闭</button></div><div class="lb-empty">未找到该用户</div>';
+    return;
+  }
+
+  try{
+    var lbRes=await supabase.from('leaderboard').select('*').eq('user_id',userId).order('score',{ascending:false}).limit(50);
+    scores=lbRes.data||[];
+  }catch(e){}
+
+  renderProfile(userInfo,scores,isSelf);
+}
+
+function renderProfile(userInfo,scores,isSelf,editing){
+  var nameEsc=escapeHtml(userInfo.name||'未知');
+  var idEsc=escapeHtml(userInfo.id||'');
+  var isAdmin=!!userInfo.is_admin;
+  var bio=userInfo.bio||'';
+  var gear=userInfo.gear||'';
+
+  var best=0,avg=0,rounds=scores.length;
+  if(scores.length>0){
+    best=scores[0].score;
+    var sum=0;
+    for(var i=0;i<scores.length;i++)sum+=scores[i].score;
+    avg=Math.round(sum/scores.length);
+  }
+  var rankText=best>0?getGrade(best):'—';
+
+  var headerHtml=
+    '<div class="profile-header">'+
+      '<div>'+
+        (editing?'<input type="text" class="profile-edit-input" id="prof_name" maxlength="16" value="'+nameEsc+'" placeholder="名字">':'<div class="profile-name">'+(isAdmin?'<span style="color:#a855f7">★</span> ':'')+nameEsc+'</div>')+
+        '<div class="profile-id">#'+idEsc+(isAdmin?' · 管理员':'')+'</div>'+
+      '</div>'+
+      '<button class="profile-close" id="btnCloseProfile" type="button">关闭</button>'+
+    '</div>';
+
+  var statsHtml=
+    '<div class="profile-stats">'+
+      '<div class="profile-stat"><div class="profile-stat-label">BEST</div><div class="profile-stat-value hl">'+best+'</div></div>'+
+      '<div class="profile-stat"><div class="profile-stat-label">AVG</div><div class="profile-stat-value">'+avg+'</div></div>'+
+      '<div class="profile-stat"><div class="profile-stat-label">ROUNDS</div><div class="profile-stat-value">'+rounds+'</div></div>'+
+      '<div class="profile-stat"><div class="profile-stat-label">RANK</div><div class="profile-stat-value" style="color:'+gradeColor(rankText)+'">'+rankText+'</div></div>'+
+    '</div>';
+
+  var bioHtml='<div class="profile-section"><div class="profile-section-label">个人介绍</div>';
+  if(editing){
+    bioHtml+='<textarea class="profile-edit-textarea" id="prof_bio" maxlength="200" placeholder="介绍一下自己...">'+escapeHtml(bio)+'</textarea>';
+  }else{
+    bioHtml+=bio?'<div class="profile-text">'+escapeHtml(bio)+'</div>':'<div class="profile-text empty">（暂无介绍）</div>';
+  }
+  bioHtml+='</div>';
+
+  var gearHtml='<div class="profile-section"><div class="profile-section-label">外设装备</div>';
+  if(editing){
+    gearHtml+='<textarea class="profile-edit-textarea" id="prof_gear" maxlength="200" placeholder="例如：鼠标 Razer Viper V3 Pro · 键盘 Wooting 60HE · 显示器 240Hz">'+escapeHtml(gear)+'</textarea>';
+  }else{
+    gearHtml+=gear?'<div class="profile-text">'+escapeHtml(gear)+'</div>':'<div class="profile-text empty">（暂无装备信息）</div>';
+  }
+  gearHtml+='</div>';
+
+  var histHtml='';
+  if(scores.length>0){
+    histHtml='<div class="profile-section"><div class="profile-section-label">历史成绩（最近 '+Math.min(scores.length,10)+' 条）</div>';
+    var top=scores.slice(0,10);
+    for(var j=0;j<top.length;j++){
+      var s=top[j];
+      var c=gradeColor(s.rank);
+      histHtml+='<div class="profile-history-item">'+
+        '<div class="ph-score">'+s.score+'</div>'+
+        '<div class="ph-rank" style="color:'+c+'">'+escapeHtml(s.rank)+'</div>'+
+        '<div class="ph-time">'+formatTs(s.ts)+'</div>'+
+      '</div>';
+    }
+    histHtml+='</div>';
+  }
+
+  var actionsHtml='';
+  if(isSelf){
+    if(editing){
+      actionsHtml='<div class="profile-actions">'+
+        '<button class="btn btn-primary" id="btnProfileSave" type="button">保存</button>'+
+        '<button class="btn" id="btnProfileCancel" type="button">取消</button>'+
+      '</div>';
+    }else{
+      actionsHtml='<div class="profile-actions">'+
+        '<button class="btn btn-primary" id="btnProfileEdit" type="button">编辑资料</button>'+
+      '</div>';
+    }
+  }
+
+  modalBox.innerHTML='<div class="modal-title"><span>用户主页</span><span class="modal-sub">'+(isSelf?'EDITABLE':'VIEW ONLY')+'</span></div>'+
+    headerHtml+statsHtml+bioHtml+gearHtml+histHtml+actionsHtml;
+
+  document.getElementById('btnCloseProfile').addEventListener('click',closeModal);
+
+  if(isSelf&&editing){
+    document.getElementById('btnProfileSave').addEventListener('click',async function(){
+      var newName=normalizeName(document.getElementById('prof_name').value);
+      var newBio=document.getElementById('prof_bio').value.trim();
+      var newGear=document.getElementById('prof_gear').value.trim();
+      if(!newName||newName.length<2){
+        alert('名字至少 2 个字母');
+        return;
+      }
+      try{
+        var upd=await supabase.from('users').update({name:newName,bio:newBio,gear:newGear,updated_ts:Date.now()}).eq('id',currentUser.id);
+        if(upd.error){
+          alert('保存失败：'+upd.error.message);
+          return;
+        }
+        if(currentUser.name!==newName){
+          currentUser.name=newName;
+          saveCurrentUser(currentUser);
+          renderUserChip();
+        }
+        userInfo.name=newName;
+        userInfo.bio=newBio;
+        userInfo.gear=newGear;
+        renderProfile(userInfo,scores,true,false);
+        showToast('保存成功');
+      }catch(e){
+        alert('网络异常：'+e.message);
+      }
+    });
+    document.getElementById('btnProfileCancel').addEventListener('click',function(){
+      renderProfile(userInfo,scores,true,false);
+    });
+  }else if(isSelf&&!editing){
+    document.getElementById('btnProfileEdit').addEventListener('click',function(){
+      renderProfile(userInfo,scores,true,true);
+    });
+  }
+}
+
+function openSelfProfile(){
+  if(!currentUser){return;}
+  openProfile(currentUser.id);
+}
 modalOverlay.addEventListener('click',function(e){if(e.target===modalOverlay)closeModal();});
 
 function initUI(){
@@ -1320,10 +1513,8 @@ function initUI(){
   cb.addEventListener('change',function(){
     if(cb.checked){
       icon.style.opacity='1';
-      icon.style.textShadow='0 0 6px rgba(168,85,247,.9)';
       box.style.borderColor='#a855f7';
       box.style.background='rgba(168,85,247,.12)';
-      box.style.boxShadow='0 0 8px rgba(168,85,247,.5)';
       label.style.borderColor='#a855f7';
       label.style.background='rgba(168,85,247,.06)';
       text.style.color='#c084fc';
