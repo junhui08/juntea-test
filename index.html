@@ -170,6 +170,7 @@ html[data-theme="light"] .summary-locked{border-color:#f5d8b0;background:#fff7ea
 .lb-fright{margin-left:auto;font-size:11px;color:var(--text-4)}
 .lb-beat{flex:none;font-size:10px;color:var(--text-4);white-space:nowrap}
 .lb-beat b{color:var(--accent);font-weight:700}
+  .lb-mob{flex:none;display:inline-flex;align-items:center;font-size:10px;padding:1px 6px;border:1px solid var(--accent-dark);color:var(--accent);background:var(--accent-soft);letter-spacing:.04em;margin-left:4px}
 .lb-skeleton{padding:14px;border-bottom:1px solid var(--border)}
 .lb-skel-line{height:11px;background:var(--panel-3);margin-bottom:8px;animation:lb-skel 1.5s ease-in-out infinite}
 .lb-skel-line:nth-child(1){width:55%}
@@ -251,6 +252,7 @@ html[data-theme="light"] .summary-locked{border-color:#f5d8b0;background:#fff7ea
 .profile-history-item .ph-score{color:var(--accent);font-weight:700;min-width:36px}
 .profile-history-item .ph-rank{font-weight:700;min-width:24px;text-align:center}
 .profile-history-item .ph-time{color:var(--text-5);font-size:11px;margin-left:auto}
+.profile-history-item .ph-mob{font-size:9px;padding:1px 6px;border:1px solid var(--accent-dark);color:var(--accent);background:var(--accent-soft);letter-spacing:.04em;margin-left:8px}
 .radar-wrap{background:var(--panel-2);border:1px solid var(--border);padding:12px;margin-bottom:20px;display:flex;justify-content:center}
 .radar-svg{width:100%;max-width:360px;height:auto}
 .radar-axis-label{font-size:9px;fill:var(--text-4);font-family:inherit}
@@ -502,7 +504,7 @@ var I18N={
     needMore1:'还需完成',needMore2:'项 · 暂不可上传',
     mobileLocked:'手机端暂不支持提交，请用电脑登录同一账号上传成绩',
     mobileLocked2:'手机端暂不支持提交，请在电脑上完成测试并上传',
-    mobileTip:'你正使用 <b>手机</b>访问Jun.Tea HUB,目前仅支持测试反应时间、序列记忆、数字记忆、色觉辨识、听觉反应。<b>成绩无法在手机端提交</b>，请到电脑端上登录账号重新测试并上传数据。',
+    mobileTip:'你正使用 <b>移动设备</b>访问Jun.Tea HUB,目前仅支持测试反应时间、序列记忆、数字记忆、色觉辨识、听觉反应。<b>成绩可提交但会显示特殊标识且不纳入电脑端排名</b>，建议到电脑端上登录账号体验完整测试并上传真实成绩。',
     btnUpload:'上传到云端',btnReset:'清空本次',confirmReset:'清空本次所有单项成绩？',
     lbTitle:'云端排行榜',lbReaction:'反应',lbSequence:'序列',lbNumber:'记忆',
     mouse:'鼠标',keyboard:'键盘',timesSuffix:'次',
@@ -538,7 +540,7 @@ var I18N={
     tRemainSec:'剩余',tSec:'秒',tHit:'命中',tFollowMouse:'鼠标跟随目标',tTrack:'追踪中...',tHitRate:'完成 · 命中率',
     tCorrect:'正确！',tLimitSec:'限时',tTypingHint:'连续打字 · 打完一句自动接下一句',
     tMultiTargets:'个靶点',tTimesCount:'次',
-    lbFilterAll:'总榜',lbFilterToday:'今日',lbFilterWeek:'本周',lbFilterProject:'总分',lbBeat:'击败',
+    lbFilterAll:'总榜',lbFilterToday:'今日',lbFilterWeek:'本周',lbFilterProject:'总分',lbBeat:'击败',lbPlatDesktop:'电脑端',lbPlatMobile:'移动端',
     lbAim:'瞄准',lbColor:'色觉',lbTyping:'打字',lbChase:'追踪',lbSound:'听觉',
     keyQuitHint:'快捷键：空格 开始/重测，R 重测，Esc 退出',
   },
@@ -560,7 +562,7 @@ var I18N={
     needMore1:'Need',needMore2:'more item(s) · Upload disabled',
     mobileLocked:'Upload is not supported on mobile. Please log in on desktop.',
     mobileLocked2:'Upload is not supported on mobile. Please complete and upload on desktop.',
-    mobileTip:'<b>Mobile mode</b>: reaction, sequence memory, number memory, color, sound available.<br>Aim, typing, chase are desktop-only.<br><b>Upload disabled on mobile.</b>',
+    mobileTip:'You are browsing Jun.Tea HUB on <b>a mobile device</b>. Only reaction, sequence memory, number memory, color, and sound tests are available. <b>Scores can be uploaded but will be marked as mobile and excluded from desktop rankings.</b> For the full experience and official scores, please log in on desktop.',
     btnUpload:'Upload to Cloud',btnReset:'Clear Session',confirmReset:'Clear all session scores?',
     lbTitle:'Cloud Leaderboard',lbReaction:'React',lbSequence:'Seq',lbNumber:'Num',
     mouse:'Mouse',keyboard:'Keyboard',timesSuffix:'x',
@@ -596,7 +598,7 @@ var I18N={
     tRemainSec:'Time left',tSec:'s',tHit:'Hits',tFollowMouse:'Follow the target with mouse',tTrack:'Tracking...',tHitRate:'Done · Accuracy',
     tCorrect:'Correct!',tLimitSec:'Limit',tTypingHint:'Continuous mode · Next sentence auto-continues',
     tMultiTargets:'targets',tTimesCount:'times',
-    lbFilterAll:'All',lbFilterToday:'Today',lbFilterWeek:'Week',lbFilterProject:'Total',lbBeat:'Beat',
+    lbFilterAll:'All',lbFilterToday:'Today',lbFilterWeek:'Week',lbFilterProject:'Total',lbBeat:'Beat',lbPlatDesktop:'Desktop',lbPlatMobile:'Mobile',
     lbAim:'Aim',lbColor:'Color',lbTyping:'Typing',lbChase:'Chase',lbSound:'Sound',
     keyQuitHint:'Hotkeys: Space start/retry, R retry, Esc quit',
   },
@@ -618,7 +620,7 @@ var I18N={
     needMore1:'あと',needMore2:'項目必要 · アップロード不可',
     mobileLocked:'モバイルでは送信できません。PCでログインして送信してください。',
     mobileLocked2:'モバイルでは送信できません。PCでテスト・送信してください。',
-    mobileTip:'<b>モバイルモード</b>：反応時間、順序記憶、数字記憶、色覚、聴覚反応が可能です。<br>エイム、タイピング、追跡はPC専用です。<br><b>モバイルでは送信できません。</b>',
+    mobileTip:'<b>モバイル端末</b>でアクセス中です。反応時間、順序記憶、数字記憶、色覚、聴覚反応のみ利用可能です。<b>スコアは送信できますが「モバイル」と表示され、PC版のランキングには反映されません。</b>フル機能と正式なスコアはPCでログインしてください。',
     btnUpload:'クラウドに送信',btnReset:'セッションをクリア',confirmReset:'今回のスコアをすべてクリアしますか？',
     lbTitle:'クラウドランキング',lbReaction:'反応',lbSequence:'順序',lbNumber:'数字',
     mouse:'マウス',keyboard:'キーボード',timesSuffix:'回',
@@ -654,7 +656,7 @@ var I18N={
     tRemainSec:'残り',tSec:'秒',tHit:'命中',tFollowMouse:'マウスで目標を追う',tTrack:'追跡中...',tHitRate:'完了 · 命中率',
     tCorrect:'正解！',tLimitSec:'制限',tTypingHint:'連続モード · 1文完了で次に自動継続',
     tMultiTargets:'個のターゲット',tTimesCount:'回',
-    lbFilterAll:'全体',lbFilterToday:'今日',lbFilterWeek:'今週',lbFilterProject:'総合',lbBeat:'撃破',
+    lbFilterAll:'全体',lbFilterToday:'今日',lbFilterWeek:'今週',lbFilterProject:'総合',lbBeat:'撃破',lbPlatDesktop:'PC',lbPlatMobile:'モバイル',
     lbAim:'エイム',lbColor:'色覚',lbTyping:'タイピング',lbChase:'追跡',lbSound:'聴覚',
     keyQuitHint:'ホットキー：Space 開始/再試行、R 再試行、Esc 終了',
   },
@@ -676,7 +678,7 @@ var I18N={
     needMore1:'앞으로',needMore2:'개 항목 필요 · 업로드 불가',
     mobileLocked:'모바일에서는 업로드할 수 없습니다. PC에서 로그인 후 업로드하세요.',
     mobileLocked2:'모바일에서는 업로드할 수 없습니다. PC에서 완료 및 업로드하세요.',
-    mobileTip:'<b>모바일 모드</b>: 반응 시간, 순서 기억, 숫자 기억, 색각, 청각 반응 가능.<br>에임, 타이핑, 추적은 PC 전용입니다.<br><b>모바일에서는 업로드할 수 없습니다.</b>',
+    mobileTip:'<b>모바일 기기</b>로 접속 중입니다. 반응 시간, 순서 기억, 숫자 기억, 색각, 청각 반응만 가능합니다. <b>점수는 업로드할 수 있지만 "모바일"로 표시되며 PC 랭킹에는 반영되지 않습니다.</b> 전체 기능과 공식 점수는 PC에서 로그인하세요.',
     btnUpload:'클라우드 업로드',btnReset:'이번 세션 초기화',confirmReset:'이번 세션의 모든 점수를 초기화하시겠습니까?',
     lbTitle:'클라우드 리더보드',lbReaction:'반응',lbSequence:'순서',lbNumber:'숫자',
     mouse:'마우스',keyboard:'키보드',timesSuffix:'회',
@@ -711,7 +713,7 @@ var I18N={
     tRemainSec:'남은',tSec:'초',tHit:'명중',tFollowMouse:'마우스로 목표 추적',tTrack:'추적 중...',tHitRate:'완료 · 명중률',
     tCorrect:'정답!',tLimitSec:'제한',tTypingHint:'연속 모드 · 문장 완료 시 자동 계속',
     tMultiTargets:'개 목표',tTimesCount:'회',
-    lbFilterAll:'전체',lbFilterToday:'오늘',lbFilterWeek:'이번 주',lbFilterProject:'종합',lbBeat:'격파',
+    lbFilterAll:'전체',lbFilterToday:'오늘',lbFilterWeek:'이번 주',lbFilterProject:'종합',lbBeat:'격파',lbPlatDesktop:'PC',lbPlatMobile:'모바일',
     lbAim:'에임',lbColor:'색각',lbTyping:'타이핑',lbChase:'추적',lbSound:'청각',
     keyQuitHint:'단축키: Space 시작/재시도, R 재시도, Esc 종료',
   }
@@ -755,7 +757,6 @@ var SUPABASE_URL='https://kntnloooxwqdjcktucri.supabase.co';
 var SUPABASE_ANON_KEY='sb_publishable_PNIvkofsMG1-2gnsL4c1-w_zM4NrgUy';
 var supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 var DEFAULT_ADMIN_NAME='JUN';
-var DEFAULT_ADMIN_KEY='qwe33069908';
 var DEFAULT_ADMIN_ID='081031';
 var REGISTER_COOLDOWN_KEY='juntea_reg_cooldown_v1';
 var REGISTER_MIN_INTERVAL_MS=15000;
@@ -915,6 +916,7 @@ var cloudLeaderboardCache=[];
 var userGearCache={};
 var lbTimeFilter='all';
 var lbProjectFilter='total';
+var lbPlatformFilter='desktop';
 var lbExpandedCacheKey='juntea_lb_expanded_v1';
 function loadExpandedCache(){try{var r=localStorage.getItem(lbExpandedCacheKey);return r?JSON.parse(r):{};}catch(e){return {};}}
 function saveExpandedCache(){try{var o={};for(var k in expandedGroups)if(expandedGroups[k])o[k]=1;localStorage.setItem(lbExpandedCacheKey,JSON.stringify(o));}catch(e){}}
@@ -1052,18 +1054,20 @@ async function doAdminLogin(){
   adminLoginName.value=name;
   if(!name){adminLoginError.textContent=t('msgAdminName');adminLoginName.focus();return;}
   if(!key){adminLoginError.textContent=t('msgAdminPwd');adminLoginKey.focus();return;}
-  if(name===DEFAULT_ADMIN_NAME&&key===DEFAULT_ADMIN_KEY){
-    currentUser={name:name,id:DEFAULT_ADMIN_ID,isAdmin:true,loginTs:Date.now()};
-    saveCurrentUser(currentUser);enterMain();return;
-  }
-  var res=await supabase.from('users').select('*').eq('name',name).eq('is_admin',true);
-  if(res.error){adminLoginError.textContent=t('msgNetErr')+res.error.message;return;}
-  if(!res.data||res.data.length===0){adminLoginError.textContent=t('msgAdminNotFound');return;}
-  var u=res.data[0];
-  if(u.key_hash!==userKeyHash(name,key)){adminLoginError.textContent=t('msgAdminPwdWrong');return;}
-  currentUser={name:name,id:u.id,isAdmin:true,loginTs:Date.now()};
-  saveCurrentUser(currentUser);
-  enterMain();
+  try{
+    var r=await supabase.rpc('admin_login_check',{p_name:name,p_password:key});
+    var u=null;
+    if(!r.error&&r.data&&r.data.length>0){u=r.data[0];}
+    if(!u){
+      var kh=userKeyHash(name,key);
+      var r2=await supabase.rpc('admin_login_check',{p_name:name,p_password:kh});
+      if(!r2.error&&r2.data&&r2.data.length>0){u=r2.data[0];}
+    }
+    if(!u){adminLoginError.textContent=t('msgAdminNotFound');return;}
+    currentUser={name:u.name,id:u.id,isAdmin:true,loginTs:Date.now()};
+    saveCurrentUser(currentUser);
+    enterMain();
+  }catch(e){adminLoginError.textContent=t('msgNetErr')+e.message;}
 }
 async function doAdminLoginInline(){
   var name=normalizeName(userLoginName.value);
@@ -1072,18 +1076,20 @@ async function doAdminLoginInline(){
   userLoginName.value=name;
   if(!name){userLoginError.textContent=t('msgAdminName');userLoginName.focus();return;}
   if(!key){userLoginError.textContent=t('msgAdminPwd');userLoginKey.focus();return;}
-  if(name===DEFAULT_ADMIN_NAME&&key===DEFAULT_ADMIN_KEY){
-    currentUser={name:name,id:DEFAULT_ADMIN_ID,isAdmin:true,loginTs:Date.now()};
-    saveCurrentUser(currentUser);enterMain();return;
-  }
-  var res=await supabase.from('users').select('*').eq('name',name).eq('is_admin',true);
-  if(res.error){userLoginError.textContent=t('msgNetErr')+res.error.message;return;}
-  if(!res.data||res.data.length===0){userLoginError.textContent=t('msgAdminNotFound');return;}
-  var u=res.data[0];
-  if(u.key_hash!==userKeyHash(name,key)){userLoginError.textContent=t('msgAdminPwdWrong');return;}
-  currentUser={name:name,id:u.id,isAdmin:true,loginTs:Date.now()};
-  saveCurrentUser(currentUser);
-  enterMain();
+  try{
+    var r=await supabase.rpc('admin_login_check',{p_name:name,p_password:key});
+    var u=null;
+    if(!r.error&&r.data&&r.data.length>0){u=r.data[0];}
+    if(!u){
+      var kh=userKeyHash(name,key);
+      var r2=await supabase.rpc('admin_login_check',{p_name:name,p_password:kh});
+      if(!r2.error&&r2.data&&r2.data.length>0){u=r2.data[0];}
+    }
+    if(!u){userLoginError.textContent=t('msgAdminNotFound');return;}
+    currentUser={name:u.name,id:u.id,isAdmin:true,loginTs:Date.now()};
+    saveCurrentUser(currentUser);
+    enterMain();
+  }catch(e){userLoginError.textContent=t('msgNetErr')+e.message;}
 }
 function saveCurrentUser(u){try{localStorage.setItem(CONFIG.currentUserKey,JSON.stringify(u));}catch(e){}}
 function loadCurrentUser(){try{var r=localStorage.getItem(CONFIG.currentUserKey);return r?JSON.parse(r):null;}catch(e){return null;}}
@@ -1143,7 +1149,7 @@ async function fetchCloudLeaderboard(){
 }
 async function addToLeaderboard(entry){
   try{
-    var res=await supabase.from('leaderboard').insert([{id:entry.id,name:entry.name,user_id:entry.userId,is_admin:entry.isAdmin,score:entry.score,rank:entry.rank,projects:entry.projects,ts:entry.ts}]);
+    var res=await supabase.from('leaderboard').insert([{id:entry.id,name:entry.name,user_id:entry.userId,is_admin:entry.isAdmin,is_mobile:!!entry.isMobile,score:entry.score,rank:entry.rank,projects:entry.projects,ts:entry.ts}]);
     if(res.error){alert(t('msgSaveFail')+res.error.message);return false;}
     lastSavedId=entry.id;
     await fetchCloudLeaderboard();
@@ -1180,9 +1186,12 @@ function renderLbFilters(count){
     {k:'sound',label:t('lbSound')}
   ];
   var h='';
-  for(var i=0;i<timeBtns.length;i++){
+    for(var i=0;i<timeBtns.length;i++){
     h+='<button class="lb-fbtn'+(lbTimeFilter===timeBtns[i].k?' active':'')+'" data-time="'+timeBtns[i].k+'" type="button">'+timeBtns[i].label+'</button>';
   }
+  h+='<div class="lb-fsep"></div>';
+  h+='<button class="lb-fbtn'+(lbPlatformFilter==='desktop'?' active':'')+'" data-plat="desktop" type="button">'+t('lbPlatDesktop')+'</button>';
+  h+='<button class="lb-fbtn'+(lbPlatformFilter==='mobile'?' active':'')+'" data-plat="mobile" type="button">'+t('lbPlatMobile')+'</button>';
   h+='<div class="lb-fsep"></div>';
   var curLabel=t('lbFilterProject');
   for(var j=0;j<projOpts.length;j++){if(projOpts[j].k===lbProjectFilter){curLabel=projOpts[j].label;break;}}
@@ -1197,6 +1206,13 @@ function renderLbFilters(count){
   var btns=el.querySelectorAll('[data-time]');
   for(var n=0;n<btns.length;n++){
     (function(b){b.addEventListener('click',function(){lbTimeFilter=b.getAttribute('data-time');refreshLeaderboardDisplay();});})(btns[n]);
+  }
+    var pbtns=el.querySelectorAll('[data-plat]');
+  for(var pn=0;pn<pbtns.length;pn++){
+    (function(b){b.addEventListener('click',function(){
+      var v=b.getAttribute('data-plat');
+      if(v!==lbPlatformFilter){lbPlatformFilter=v;refreshLeaderboardDisplay();}
+    });})(pbtns[pn]);
   }
 
   var drop=document.getElementById('lbFdrop');
@@ -1232,7 +1248,7 @@ function renderLbFilters(count){
   }
 }
 function refreshLeaderboardDisplay(hid){
-  var list=cloudLeaderboardCache||[];
+  var list=(cloudLeaderboardCache||[]).filter(function(x){return lbPlatformFilter==='mobile'?!!x.is_mobile:!x.is_mobile;});
   var todayStart=new Date();todayStart.setHours(0,0,0,0);
   var todayTs=todayStart.getTime();
   var weekStart=todayTs-((todayStart.getDay()||7)-1)*86400000;
@@ -1269,6 +1285,7 @@ function renderLeaderboardHtml(groups,hid){
     var isMe=hid&&g.records.some(function(r){return r.id===hid;});
     if(isMe)cls+=' is-me';
     var star=g.isAdmin?'<span class="star">★</span>':'';
+    var isMob=!!best.is_mobile;
     var cnt=g.records.length;
     var beatPct=getBeatPercent(index,top.length);
     var _gi=userGearCache[g.userId]||{};
@@ -1284,7 +1301,7 @@ function renderLeaderboardHtml(groups,hid){
     else{displayScore=getProjectScore(latest,lbProjectFilter)||0;displayRank=getGrade(displayScore);displayColor=gradeColor(displayRank);}
     var line1='<div class="lb-line1">'+
       '<span class="lb-rank">#'+(index+1)+'</span>'+
-      '<span class="lb-name">'+escapeHtml(g.name)+star+'<span class="uid">#'+escapeHtml(g.userId)+'</span>'+(cnt>1?'<span class="cnt">'+cnt+t('timesSuffix')+'</span>':'')+'</span>'+
+            '<span class="lb-name">'+escapeHtml(g.name)+star+'<span class="uid">#'+escapeHtml(g.userId)+'</span>'+(cnt>1?'<span class="cnt">'+cnt+t('timesSuffix')+'</span>':'')+(isMob?'<span class="lb-mob">移动端</span>':'')+'</span>'+
       (gear?'<span class="lb-gear">'+escapeHtml(gear)+'</span>':'')+
            '<span class="lb-latest"><span class="tag">'+t('lbLatest')+'</span>'+latestItems.join('')+'<span class="lb-grade" style="color:'+displayColor+'">'+escapeHtml(displayRank)+'</span><span class="lb-score" style="color:'+scoreColor+'">'+displayScore+'<i>'+t('unitPt')+'</i></span></span>'+
     '</div>';
@@ -1773,12 +1790,11 @@ function renderGrid(){
   if(r.ready){
     var totalHtml='<div><div style="font-size:11px;color:var(--text-4);margin-bottom:6px">'+t('summaryTitle')+'</div><div class="summary-total">'+r.total+'<span class="u">'+t('unitPt')+'</span></div></div>';
     var infoHtml='<div class="summary-info">'+t('doneCount')+' <b>'+r.tested+'</b> / '+r.totalCount+' '+t('unitItem')+'<br>'+t('gradeLabel')+' <span style="color:'+gradeColor(r.grade)+';font-weight:800;font-size:16px">'+r.grade+'</span></div>';
-    if(IS_MOBILE){sh=totalHtml+infoHtml+'<div class="summary-locked">'+t('mobileLocked')+'</div>'+'<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="btnResetSession" type="button" style="flex:none;padding:12px 20px">'+t('btnReset')+'</button></div>';}
-    else{sh=totalHtml+infoHtml+'<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary" id="btnSaveTotal" type="button" style="flex:none;padding:12px 20px">'+t('btnUpload')+'</button><button class="btn" id="btnResetSession" type="button" style="flex:none;padding:12px 20px">'+t('btnReset')+'</button></div>';}
+        sh=totalHtml+infoHtml+'<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary" id="btnSaveTotal" type="button" style="flex:none;padding:12px 20px">'+t('btnUpload')+'</button><button class="btn" id="btnResetSession" type="button" style="flex:none;padding:12px 20px">'+t('btnReset')+'</button></div>';
   }else{
     var emptyHtml='<div><div style="font-size:11px;color:var(--text-4);margin-bottom:6px">'+t('summaryTitle')+'</div><div class="summary-total" style="color:var(--text-7)">—<span class="u" style="color:var(--text-7)">'+t('unitPt')+'</span></div></div>';
     var needHtml='<div class="summary-info">'+t('doneCount')+' <b>'+r.tested+'</b> / '+r.totalCount+' '+t('unitItem')+'<br>'+t('needN1')+' <b style="color:var(--warn)">'+r.required+'</b> '+t('needN2')+'</div>';
-    sh=emptyHtml+needHtml+(IS_MOBILE?'<div class="summary-locked">'+t('mobileLocked2')+'</div>':'<div class="summary-locked">'+t('needMore1')+' '+r.need+' '+t('needMore2')+'</div>')+'<div style="display:flex;gap:8px;flex-wrap:wrap">'+(IS_MOBILE?'':'<button class="btn" type="button" disabled style="flex:none;padding:12px 20px">'+t('btnUpload')+'</button>')+'<button class="btn" id="btnResetSession" type="button" style="flex:none;padding:12px 20px">'+t('btnReset')+'</button>'+'</div>';
+        sh=emptyHtml+needHtml+'<div class="summary-locked">'+t('needMore1')+' '+r.need+' '+t('needMore2')+'</div>'+'<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" type="button" disabled style="flex:none;padding:12px 20px">'+t('btnUpload')+'</button><button class="btn" id="btnResetSession" type="button" style="flex:none;padding:12px 20px">'+t('btnReset')+'</button>'+'</div>';
   }
   summaryBox.innerHTML=sh;
   var b=document.getElementById('btnSaveTotal');if(b)b.addEventListener('click',function(){openSaveDialog();});
@@ -1786,7 +1802,6 @@ function renderGrid(){
   gridSub.textContent=t('doneCount')+' '+r.tested+' / '+r.totalCount+' '+t('unitItem');
 }
 function openSaveDialog(){
-  if(IS_MOBILE){alert(t('msgMobileUpload'));return;}
   try{
     var _lastUp=parseInt(localStorage.getItem(UPLOAD_COOLDOWN_KEY)||'0',10);
     if(_lastUp&&Date.now()-_lastUp<UPLOAD_COOLDOWN_MS){
@@ -1804,7 +1819,7 @@ function openSaveDialog(){
     var btn=this;if(btn.disabled)return;btn.disabled=true;btn.textContent='...';
     var prevBest=0;
     try{var _prevList=(cloudLeaderboardCache||[]).filter(function(x){return (x.user_id||x.id)===currentUser.id;});if(_prevList.length>0)prevBest=Math.max.apply(null,_prevList.map(function(x){return x.score||0;}));}catch(e){}
-    var entry={id:Date.now()+'_'+Math.random().toString(36).slice(2,8),name:currentUser.name,userId:currentUser.id,isAdmin:!!currentUser.isAdmin,score:r.total,rank:r.grade,projects:r.items.map(function(it){return{key:it.key,score:it.score,weight:it.weight};}),ts:Date.now()};
+        var entry={id:Date.now()+'_'+Math.random().toString(36).slice(2,8),name:currentUser.name,userId:currentUser.id,isAdmin:!!currentUser.isAdmin,isMobile:IS_MOBILE,score:r.total,rank:r.grade,projects:r.items.map(function(it){return{key:it.key,score:it.score,weight:it.weight};}),ts:Date.now()};
     addToLeaderboard(entry).then(function(ok){
       if(ok){
         try{localStorage.setItem(UPLOAD_COOLDOWN_KEY,String(Date.now()));}catch(e){}
@@ -1813,7 +1828,7 @@ function openSaveDialog(){
         if(entry.score>prevBest&&prevBest>0){
           sfxBest();showToast(t('msgUploadOk')+' · NEW BEST');
           setTimeout(function(){var myRow=leaderboardBody.querySelector('.lb-group.is-me .lb-score');if(myRow){myRow.classList.add('rec-flash');setTimeout(function(){myRow.classList.remove('rec-flash');},1600);}},80);
-        }else{sfxDone();showToast(t('msgUploadOk'));}
+        }else{sfxDone();showToast(IS_MOBILE?(t('msgUploadOk')+' · 成绩仅加入移动端排行榜'):t('msgUploadOk'));}
       }else{btn.disabled=false;btn.textContent=t('btnUpload');}
     });
   });
@@ -2022,7 +2037,8 @@ function renderProfile(userInfo,scores,isSelf,editing){
     var top=scores.slice(0,10);
     for(var j=0;j<top.length;j++){
       var s=top[j];var c=gradeColor(s.rank);
-      histHtml+='<div class="profile-history-item"><div class="ph-score">'+s.score+'</div><div class="ph-rank" style="color:'+c+'">'+escapeHtml(s.rank)+'</div><div class="ph-time">'+formatTs(s.ts)+'</div></div>';
+            var _mob=s.is_mobile?'<div class="ph-mob">移动端</div>':'';
+      histHtml+='<div class="profile-history-item"><div class="ph-score">'+s.score+'</div><div class="ph-rank" style="color:'+c+'">'+escapeHtml(s.rank)+'</div>'+_mob+'<div class="ph-time">'+formatTs(s.ts)+'</div></div>';
     }
     histHtml+='</div>';
   }
