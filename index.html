@@ -276,8 +276,8 @@ body{padding:12px 8px}
         <div class="login-brand" id="loginBrand"></div>
         <div class="login-sub" style="font-family:'Microsoft YaHei','PingFang SC','Noto Sans SC',sans-serif;letter-spacing:.05em">登录你的Jun.Tea账户</div>
         <div class="login-tabs">
-          <button class="login-tab active" data-tab="user" type="button">普通用户</button>
-          <button class="login-tab" data-tab="admin" type="button">★ 管理员</button>
+          <button class="login-tab active" data-tab="login" type="button">登 录</button>
+       	  <button class="login-tab" data-tab="register" type="button">注 册</button>
         </div>
         <div class="login-panel" id="userLoginPanel">
           <div class="login-field">
@@ -288,16 +288,19 @@ body{padding:12px 8px}
             <label>密码 / PASSWORD</label>
             <input type="password" id="userLoginKey" maxlength="64" autocomplete="off" placeholder="输入或设置你的密码" class="pwd">
           </div>
-          <div class="login-error" id="userLoginError"></div>
+          <label for="adminModeCheck" id="adminModeLabel" style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:12px 14px;border:1px solid #262626;background:#0a0a0a;cursor:pointer;user-select:none;font-family:'Microsoft YaHei','PingFang SC','Noto Sans SC',sans-serif;transition:all .2s">
+<input type="checkbox" id="adminModeCheck" style="display:none">
+<span id="adminBox" style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border:1px solid #444;background:#0a0a0a;transition:all .2s;flex-shrink:0">
+<span id="adminStarIcon" style="font-size:14px;color:#c084fc;transition:opacity .2s;line-height:1;opacity:0">★</span>
+</span>
+<span id="adminModeText" style="font-size:13px;color:#888;letter-spacing:.05em">以管理员身份继续</span>
+</label>
+<div class="login-error" id="userLoginError"></div>
           <div class="login-btns">
             <button class="login-btn" id="btnUserLogin" type="button">登 录</button>
-            <button class="login-btn ghost" id="btnUserRegister" type="button">注 册</button>
+<button class="login-btn" id="btnUserRegister" type="button" style="display:none">注 册</button>
           </div>
-          <div class="login-hint">
-            <b>首次使用</b>：填名字 + 自设密码，点【注册】<br>
-            <b>已有账号</b>：填名字 + 你的密码，点【登录】<br>
-            名字可重复，相同名字以不同密码区分账户
-          </div>
+          <div class="login-hint" id="loginHint"><b>登录</b>：欢迎来到 Jun.Tea HUB</div>
         </div>
         <div class="login-panel admin-mode" id="adminLoginPanel" style="display:none">
           <div class="admin-badge"><span class="lock">以管理员身份登录</span></div>
@@ -562,11 +565,20 @@ for(var i=0;i<loginTabs.length;i++){
       for(var j=0;j<loginTabs.length;j++)loginTabs[j].classList.remove('active');
       tab.classList.add('active');
       var t=tab.getAttribute('data-tab');
-      userLoginPanel.style.display=(t==='user')?'block':'none';
-      adminLoginPanel.style.display=(t==='admin')?'block':'none';
-      userLoginError.textContent='';adminLoginError.textContent='';
-      if(t==='user')setTimeout(function(){userLoginName.focus();},50);
-      else setTimeout(function(){adminLoginName.focus();},50);
+      userLoginPanel.style.display='block';
+      adminLoginPanel.style.display='none';
+      userLoginError.textContent='';
+      if(t==='login'){
+        document.getElementById('btnUserLogin').style.display='block';
+        document.getElementById('btnUserRegister').style.display='none';
+        userLoginKey.placeholder='输入曾注册时创建的密码';
+        document.getElementById('loginHint').innerHTML='<b>登录</b>：欢迎来到 Jun.Tea HUB<br>还没账号？切到上方【注 册】创建一个！';
+      }else{
+        document.getElementById('btnUserLogin').style.display='none';
+        document.getElementById('btnUserRegister').style.display='block';
+        userLoginKey.placeholder='设置一个至少 4 位的密码';
+        document.getElementById('loginHint').innerHTML='<b>注册</b>：请牢记密码，忘记密码后无法找回账户 <br>创建密码，用于绑定当前名字';
+      }
     });
   })(loginTabs[i]);
 }
@@ -575,11 +587,22 @@ function renderLogin(){
   loginBrand.innerHTML=renderBrand(CONFIG.brandName);
   loginView.style.display='block';mainView.style.display='none';
   userLoginName.value='';userLoginKey.value='';userLoginError.textContent='';
-  adminLoginName.value='';adminLoginKey.value='';adminLoginError.textContent='';
-  setTimeout(function(){userLoginName.focus();},50);
+var _chk=document.getElementById('adminModeCheck');
+if(_chk){_chk.checked=false;_chk.dispatchEvent(new Event('change'));}  
+adminLoginName.value='';adminLoginKey.value='';adminLoginError.textContent='';
+  var _t1=document.querySelector('.login-tab[data-tab="login"]');
+var _t2=document.querySelector('.login-tab[data-tab="register"]');
+if(_t1)_t1.classList.add('active');
+if(_t2)_t2.classList.remove('active');
+document.getElementById('btnUserLogin').style.display='block';
+document.getElementById('btnUserRegister').style.display='none';
+document.getElementById('loginHint').innerHTML='<b>登录</b>：欢迎来到 Jun.Tea HUB<br>还没账号？切到上方【注 册】创建一个！';
+setTimeout(function(){userLoginName.focus();},50);
 }
 
 async function doUserRegister(){
+  var _chk=document.getElementById('adminModeCheck');
+  if(_chk&&_chk.checked){userLoginError.textContent='你没有注册管理员的资格';return;}
   var name=normalizeName(userLoginName.value);
   var key=userLoginKey.value.trim();
   userLoginError.textContent='';
@@ -644,6 +667,27 @@ async function doAdminLogin(){
   saveCurrentUser(currentUser);
   enterMain();
 }
+async function doAdminLoginInline(){
+  var name=normalizeName(userLoginName.value);
+  var key=userLoginKey.value.trim();
+  userLoginError.textContent='';
+  userLoginName.value=name;
+  if(!name){userLoginError.textContent='请输入管理员名字';userLoginName.focus();return;}
+  if(!key){userLoginError.textContent='请输入管理员密码';userLoginKey.focus();return;}
+  if(name===DEFAULT_ADMIN_NAME&&key===DEFAULT_ADMIN_KEY){
+    currentUser={name:name,id:DEFAULT_ADMIN_ID,isAdmin:true,loginTs:Date.now()};
+    saveCurrentUser(currentUser);
+    enterMain();return;
+  }
+  var res=await supabase.from('users').select('*').eq('name',name).eq('is_admin',true);
+  if(res.error){userLoginError.textContent='网络错误：'+res.error.message;return;}
+  if(!res.data||res.data.length===0){userLoginError.textContent='管理员不存在或密码错误';return;}
+  var u=res.data[0];
+  if(u.key_hash!==userKeyHash(name,key)){userLoginError.textContent='管理员密码错误';return;}
+  currentUser={name:name,id:u.id,isAdmin:true,loginTs:Date.now()};
+  saveCurrentUser(currentUser);
+  enterMain();
+}
 function saveCurrentUser(u){try{localStorage.setItem(CONFIG.currentUserKey,JSON.stringify(u));}catch(e){}}
 function loadCurrentUser(){try{var r=localStorage.getItem(CONFIG.currentUserKey);return r?JSON.parse(r):null;}catch(e){return null;}}
 function enterMain(){
@@ -672,11 +716,17 @@ btnUserRegister.addEventListener('click',async function(){
     setTimeout(function(){registerBtnLock=false;btnUserRegister.disabled=false;btnUserRegister.textContent=old;},REGISTER_BUTTON_LOCK_MS);
   }
 });
-btnUserLogin.addEventListener('click',doUserLogin);
+var adminModeCheck=document.getElementById('adminModeCheck');
+btnUserLogin.addEventListener('click',function(){
+  if(adminModeCheck&&adminModeCheck.checked){
+    doAdminLoginInline();
+  }else{
+    doUserLogin();
+  }
+});
 btnAdminLogin.addEventListener('click',doAdminLogin);
 userLoginName.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();userLoginKey.focus();}});
-userLoginKey.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doUserLogin();}});
-adminLoginName.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();adminLoginKey.focus();}});
+userLoginKey.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();var c=document.getElementById('adminModeCheck');if(c&&c.checked){doAdminLoginInline();}else{var r=document.querySelector('.login-tab[data-tab="register"]');if(r&&r.classList.contains('active')){btnUserRegister.click();}else{doUserLogin();}}}});adminLoginName.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();adminLoginKey.focus();}});
 adminLoginKey.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doAdminLogin();}});
 btnLogout.addEventListener('click',doLogout);
 
@@ -1259,6 +1309,37 @@ function initUI(){
   loginBrand.innerHTML=renderBrand(CONFIG.brandName);
   var u=loadCurrentUser();if(u&&u.name){currentUser=u;enterMain();}else renderLogin();
 }
+/* 管理员复选框视觉联动 */
+(function(){
+  var cb=document.getElementById('adminModeCheck');
+  var box=document.getElementById('adminBox');
+  var icon=document.getElementById('adminStarIcon');
+  var label=document.getElementById('adminModeLabel');
+  var text=document.getElementById('adminModeText');
+  if(!cb||!box||!icon||!label||!text)return;
+  cb.addEventListener('change',function(){
+    if(cb.checked){
+      icon.style.opacity='1';
+      icon.style.textShadow='0 0 6px rgba(168,85,247,.9)';
+      box.style.borderColor='#a855f7';
+      box.style.background='rgba(168,85,247,.12)';
+      box.style.boxShadow='0 0 8px rgba(168,85,247,.5)';
+      label.style.borderColor='#a855f7';
+      label.style.background='rgba(168,85,247,.06)';
+      text.style.color='#c084fc';
+    }else{
+      icon.style.opacity='0';
+      icon.style.textShadow='none';
+      box.style.borderColor='#444';
+      box.style.background='#0a0a0a';
+      box.style.boxShadow='none';
+      label.style.borderColor='#262626';
+      label.style.background='#0a0a0a';
+      text.style.color='#888';
+    }
+  });
+})();
+
 initUI();
 </script>
 </body>
