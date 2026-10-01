@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Jun.Tea · 综合反应测试</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"JetBrains Mono","SF Mono",Consolas,"Courier New",monospace;background:#0a0a0a;color:#e8e8e8;min-height:100vh;padding:24px 16px;user-select:none;-webkit-user-select:none;letter-spacing:.02em;display:flex;justify-content:center;align-items:flex-start;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.container{width:100%;max-width:960px}
+.brand-bar{display:flex;justify-content:space-between;align-items:center;padding:0 4px 14px;border-bottom:1px solid #1e1e1e;margin-bottom:16px;gap:12px;flex-wrap:wrap}
+.brand{font-size:14px;font-weight:700;letter-spacing:.15em}
+.brand .dot{color:#00ffff}
+.brand-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.brand-meta{font-size:11px;color:#555;letter-spacing:.1em}
+.user-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid #1e1e1e;background:#0d0d0d;font-size:11px;letter-spacing:.1em;color:#aaa}
+.user-chip.admin{border-color:#a855f7;background:rgba(168,85,247,.08);color:#c084fc;box-shadow:0 0 12px rgba(168,85,247,.3)}
+.user-chip .star{color:#a855f7;font-size:12px}
+.user-chip .uid{color:#666;font-size:10px}
+.user-chip.admin .uid{color:#a855f7}
+.logout-btn{padding:4px 10px;border:1px solid #262626;background:#111;color:#888;font-family:inherit;font-size:11px;letter-spacing:.1em;cursor:pointer}
+.logout-btn:hover{color:#ff5252;border-color:#3a1010}
+.mobile-tip{display:none;padding:14px 16px;background:rgba(255,159,67,.08);border:1px solid #3a2a10;color:#ff9f43;font-size:12px;letter-spacing:.05em;margin-bottom:16px;line-height:1.7;border-radius:0}
+.mobile-tip b{color:#ffbe76}
+.login-wrap{display:flex;justify-content:center;align-items:center;min-height:70vh;width:100%}
+.login-box{width:100%;max-width:460px;background:#111;border:1px solid #1e1e1e;padding:0}
+.login-brand{text-align:center;font-size:20px;font-weight:700;letter-spacing:.25em;padding:32px 32px 6px 32px}
+.login-brand .dot{color:#00ffff}
+.login-sub{text-align:center;font-size:11px;color:#555;letter-spacing:.2em;margin-bottom:24px}
+.login-tabs{display:flex;background:#0d0d0d;border-bottom:1px solid #1e1e1e}
+.login-tab{flex:1;padding:14px;background:transparent;border:none;color:#666;font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.2em;cursor:pointer;position:relative;transition:color .15s}
+.login-tab:hover{color:#aaa}
+.login-tab.active{color:#00ffff}
+.login-tab.active::after{content:'';position:absolute;bottom:-1px;left:20%;right:20%;height:2px;background:#00ffff}
+.login-tab[data-tab="admin"].active{color:#a855f7}
+.login-tab[data-tab="admin"].active::after{background:#a855f7}
+.login-panel{padding:28px 32px 36px 32px}
+.login-panel.admin-mode{background:linear-gradient(180deg,rgba(168,85,247,.04) 0%,transparent 100%);border-top:2px solid #a855f7}
+.admin-badge{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;background:rgba(168,85,247,.08);border:1px solid #a855f7;margin-bottom:20px;font-size:11px;font-weight:700;letter-spacing:.25em;color:#c084fc}
+.admin-badge .lock{font-size:14px}
+.login-field{margin-bottom:16px}
+.login-field label{display:block;font-size:11px;color:#666;letter-spacing:.15em;margin-bottom:8px}
+.login-field input{width:100%;padding:13px 14px;background:#0a0a0a;border:1px solid #262626;color:#e8e8e8;font-family:inherit;font-size:14px;outline:none;text-transform:uppercase;-webkit-appearance:none;border-radius:0}
+.login-field input.pwd{text-transform:none}
+.login-field input:focus{border-color:#00ffff}
+.login-panel.admin-mode .login-field input:focus{border-color:#a855f7}
+.login-error{font-size:12px;color:#ff5252;min-height:18px;margin-bottom:10px;line-height:1.5}
+.login-btns{display:flex;gap:8px;margin-top:8px}
+.login-btn{flex:1;padding:14px;background:#00ffff;color:#001a1f;border:1px solid #00ffff;font-family:inherit;font-size:14px;font-weight:700;letter-spacing:.2em;cursor:pointer}
+.login-btn:hover{background:#00cccc}
+.login-btn.ghost{background:transparent;color:#00ffff;border:1px solid #00ffff}
+.login-btn.ghost:hover{background:rgba(0,255,255,.08)}
+.login-btn:disabled{opacity:.5;cursor:not-allowed}
+.login-btn.admin{background:#a855f7;color:#fff;border-color:#a855f7}
+.login-btn.admin:hover{background:#9333ea}
+.login-hint{font-size:10px;color:#555;text-align:center;margin-top:20px;line-height:1.9}
+.login-hint b{color:#888}
+.view-title{font-size:14px;font-weight:700;letter-spacing:.2em;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.view-title .sub{font-size:11px;color:#666;font-weight:400}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.card{background:#111;border:1px solid #1e1e1e;padding:18px;cursor:pointer}
+.card:hover{border-color:#00ffff}
+.card.done{border-color:#00a0a0;background:#0d1618}
+.card.expired{border-color:#3a1010}
+.card-name{font-size:14px;font-weight:700;letter-spacing:.1em;margin-bottom:6px}
+.card-desc{font-size:11px;color:#666;line-height:1.5;margin-bottom:12px;min-height:32px}
+.card-score{font-size:32px;font-weight:800;line-height:1}
+.card-score .u{font-size:12px;color:#555;margin-left:4px}
+.card-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:8px;font-size:10px;color:#555}
+.card-tag{font-size:9px;padding:2px 6px;border:1px solid #262626;color:#666}
+.card-tag.done{color:#00ffff;border-color:#0a3a3a}
+.card-tag.expired{color:#ff5252;border-color:#3a1010}
+.summary{margin-top:16px;background:#111;border:1px solid #1e1e1e;padding:18px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.summary-total{font-size:40px;font-weight:800;line-height:1}
+.summary-total .u{font-size:14px;color:#555;margin-left:6px}
+.summary-info{font-size:11px;color:#666;line-height:1.8}
+.summary-info b{color:#e8e8e8}
+.summary-locked{font-size:11px;color:#ff9f43;padding:8px 12px;border:1px solid #3a2a10;background:#1a1408}
+.test-area{background:#111;border:1px solid #1e1e1e;min-height:420px;display:flex;flex-direction:column}
+.test-header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #1e1e1e}
+.test-header-name{font-size:13px;font-weight:700;letter-spacing:.2em;color:#00ffff}
+.test-header-info{font-size:11px;color:#666}
+.test-body{flex:1;position:relative;min-height:380px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.test-panel{width:100%;height:380px;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:pointer;position:relative;background:#111}
+.test-panel.w{background:#8a1f1f}
+.test-panel.r{background:#00e0e0}
+.test-panel.e{background:#5a1010}
+.test-panel.s{background:#0d2430}
+.test-panel.i{background:#3a0a0a}
+.test-panel .mt{font-size:26px;font-weight:700;color:#fff;text-align:center;padding:0 20px;line-height:1.4}
+.test-panel .st{font-size:13px;color:rgba(255,255,255,.7);text-align:center;margin-top:10px;padding:0 20px}
+.aim-target{position:absolute;border-radius:50%;background:#00ffff;cursor:crosshair;border:2px solid #00a0a0;display:flex;align-items:center;justify-content:center;color:#001a1f;font-weight:800}
+.aim-target:active{background:#00cccc}
+.seq-grid{display:grid;gap:4px;background:#1e1e1e;border:1px solid #1e1e1e;padding:4px}
+.seq-cell{background:#1a1a1a;cursor:pointer}
+.seq-cell:hover{background:#222}
+.seq-cell.on{background:#00ffff}
+.seq-cell.ok{background:#00b8b8}
+.num-display{font-size:72px;font-weight:800;color:#e8e8e8;letter-spacing:.1em;text-align:center}
+.num-input{padding:16px;font-size:24px;background:#0a0a0a;border:1px solid #262626;color:#e8e8e8;font-family:inherit;letter-spacing:.2em;text-align:center;outline:none;width:100%;max-width:500px;-webkit-appearance:none;border-radius:0}
+.num-input:focus{border-color:#00ffff}
+.color-grid{display:grid;gap:8px;padding:8px}
+.color-cell{cursor:pointer;border-radius:4px}
+.typing-text{font-size:20px;line-height:1.8;padding:24px 32px;color:#888;text-align:left;max-width:760px}
+.typing-text .ok{color:#00ffff}
+.typing-text .bad{color:#ff5252;background:#3a0a0a}
+.typing-text .cur{border-bottom:2px solid #fff}
+.typing-input{width:100%;max-width:760px;padding:14px;font-size:18px;background:#0a0a0a;border:1px solid #262626;color:#e8e8e8;font-family:inherit;outline:none;margin-top:20px;-webkit-appearance:none;border-radius:0}
+.typing-input:focus{border-color:#00ffff}
+.chase-area{position:relative;width:100%;height:380px;background:#0a0a0a;cursor:crosshair;overflow:hidden}
+.chase-target{position:absolute;border-radius:50%;background:radial-gradient(circle,#00ffff,#00a0a0);border:2px solid #fff;pointer-events:none}
+.chase-cursor{position:absolute;width:14px;height:14px;border-radius:50%;background:#ff5252;pointer-events:none;transform:translate(-50%,-50%);border:2px solid #fff}
+.test-foot{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-top:1px solid #1e1e1e;font-size:11px;color:#666}
+.leaderboard-section{margin-top:16px;border:1px solid #1e1e1e;background:#111}
+.leaderboard-header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:#0d0d0d;border-bottom:1px solid #1e1e1e;cursor:pointer}
+.leaderboard-header:hover{background:#131313}
+.leaderboard-header-title{font-size:12px;font-weight:700;letter-spacing:.2em;display:flex;align-items:center;gap:10px}
+.leaderboard-header-count{font-size:11px;color:#00ffff}
+.leaderboard-toggle{font-size:11px;color:#555}
+.leaderboard-body{display:block}
+.leaderboard-body.collapsed{display:none}
+.lb-group{border-bottom:1px solid #141414}
+.lb-group:last-child{border-bottom:none}
+.lb-row{display:grid;grid-template-columns:52px 1fr 70px 56px 190px;padding:14px 16px;font-size:13px;align-items:center;cursor:pointer}
+.lb-row:hover{background:#131313}
+.lb-group.rank-1 .lb-row{background:linear-gradient(90deg,rgba(255,215,0,.14) 0%,rgba(255,215,0,.02) 55%,transparent 100%);border-left:3px solid #ffd700}
+.lb-group.rank-2 .lb-row{background:linear-gradient(90deg,rgba(192,192,192,.12) 0%,rgba(192,192,192,.02) 55%,transparent 100%);border-left:3px solid #c0c0c0}
+.lb-group.rank-3 .lb-row{background:linear-gradient(90deg,rgba(205,127,50,.12) 0%,rgba(205,127,50,.02) 55%,transparent 100%);border-left:3px solid #cd7f32}
+.lb-group.is-admin .lb-row{background:linear-gradient(90deg,rgba(168,85,247,.20) 0%,rgba(168,85,247,.04) 55%,transparent 100%);border-left:3px solid #a855f7;border-right:2px solid #a855f7}
+.lb-group.is-admin .lb-row:hover{background:linear-gradient(90deg,rgba(168,85,247,.26) 0%,rgba(168,85,247,.06) 55%,transparent 100%)}
+.lb-group.is-me .lb-row{box-shadow:inset 0 0 0 1px rgba(0,255,255,.3)}
+.lb-rank{font-weight:800;font-size:14px}
+.lb-group.rank-1 .lb-rank{color:#ffd700}
+.lb-group.rank-2 .lb-rank{color:#c0c0c0}
+.lb-group.rank-3 .lb-rank{color:#cd7f32}
+.lb-group.is-admin .lb-rank{color:#c084fc}
+.lb-group:not(.rank-1):not(.rank-2):not(.rank-3):not(.is-admin) .lb-rank{color:#555;font-size:12px;font-weight:700}
+.lb-name{color:#e8e8e8;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px;display:flex;align-items:center;gap:6px}
+.lb-group.is-admin .lb-name{color:#e9d5ff}
+.lb-name .star{color:#a855f7;font-size:13px}
+.lb-name .uid{font-size:10px;color:#555;font-weight:400}
+.lb-group.is-admin .lb-name .uid{color:#a855f7}
+.lb-name .cnt{font-size:10px;padding:1px 6px;background:#1a1a1a;border:1px solid #262626;color:#888;letter-spacing:.05em}
+.lb-name .toggle-arrow{font-size:10px;color:#555}
+.lb-score{color:#00ffff;font-weight:800;text-align:right;font-size:15px}
+.lb-group.is-admin .lb-score{color:#c084fc}
+.lb-grade{text-align:center;font-weight:800;font-size:14px}
+.lb-ts{color:#4a7a7a;text-align:right;font-size:11px}
+.lb-history{background:#0d0d0d;border-top:1px solid #1a1a1a}
+.lb-history.collapsed{display:none}
+.lb-history-inner{padding:8px 16px 12px 68px;display:flex;flex-wrap:wrap;gap:8px}
+.lb-history-item{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:#111;border:1px solid #1e1e1e;font-size:11px}
+.lb-history-item .sc{color:#00ffff;font-weight:700}
+.lb-history-item .rk{font-weight:700}
+.lb-history-item .tm{color:#555;font-size:10px}
+.lb-history-item.is-best{border-color:#00a0a0;background:#0d1618}
+.lb-group.is-admin .lb-history-item{border-color:#3a1f5c}
+.lb-group.is-admin .lb-history-item.is-best{border-color:#a855f7;background:rgba(168,85,247,.06)}
+.lb-empty{padding:24px;text-align:center;font-size:12px;color:#444;letter-spacing:.15em}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:flex;justify-content:center;align-items:center;z-index:9999;padding:20px}
+.modal{background:#111;border:1px solid #262626;padding:24px;max-width:900px;width:100%;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:13px;font-weight:700;letter-spacing:.25em;color:#00ffff;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #1e1e1e;display:flex;justify-content:space-between;align-items:center}
+.modal-sub{font-size:10px;color:#444}
+.admin-tabs{display:flex;gap:1px;background:#1e1e1e;border:1px solid #1e1e1e;margin-bottom:20px;flex-wrap:wrap}
+.tab-btn{flex:1;min-width:100px;padding:12px;background:#0d0d0d;border:none;color:#666;font-family:inherit;font-size:12px;font-weight:700;letter-spacing:.15em;cursor:pointer}
+.tab-btn:hover{color:#aaa}
+.tab-btn.active{background:#111;color:#00ffff}
+.modal-section-title{font-size:11px;color:#666;letter-spacing:.15em;margin:18px 0 12px;padding-bottom:6px;border-bottom:1px dashed #1e1e1e}
+.modal-section-title:first-child{margin-top:0}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-field.full{grid-column:1/-1}
+.modal-field label{display:block;font-size:11px;color:#666;margin-bottom:6px}
+.modal-field input,.modal-field textarea{width:100%;padding:10px 12px;background:#0a0a0a;border:1px solid #262626;color:#e8e8e8;font-family:inherit;font-size:13px;outline:none}
+.modal-field input:focus,.modal-field textarea:focus{border-color:#00ffff}
+.modal-field textarea{resize:vertical;min-height:120px;line-height:1.6;font-size:12px}
+.modal-hint{font-size:10px;color:#555;margin-top:6px;line-height:1.6}
+.modal-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid #1e1e1e}
+.modal-actions .btn{flex:1;min-width:100px}
+.btn{padding:13px;border:1px solid #262626;background:#1a1a1a;color:#e8e8e8;font-family:inherit;font-size:13px;font-weight:700;letter-spacing:.15em;cursor:pointer;flex:1}
+.btn:hover{background:#222}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-primary{background:#00ffff;color:#001a1f;border-color:#00ffff}
+.btn-primary:hover{background:#00cccc}
+.btn-danger{background:#2a0e0e;color:#ff5252;border-color:#3a1010}
+.btn-sm{padding:6px 10px;font-size:11px;flex:none}
+.lb-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.lb-toolbar .btn{flex:none}
+.lb-admin-header{display:grid;grid-template-columns:36px 1fr 70px 80px 50px 190px 100px;gap:8px;padding:10px 12px;background:#0d0d0d;border:1px solid #1e1e1e;border-bottom:none;font-size:10px;color:#666;align-items:center}
+.lb-admin-row{display:grid;grid-template-columns:36px 1fr 70px 80px 50px 190px 100px;gap:8px;padding:10px 12px;background:#0a0a0a;border:1px solid #1a1a1a;border-bottom:none;align-items:center;font-size:12px}
+.lb-admin-row:last-child{border-bottom:1px solid #1a1a1a}
+.lb-admin-row.is-admin{background:rgba(168,85,247,.06);border-left:3px solid #a855f7;padding-left:10px}
+.lb-admin-row .cell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-admin-row .name{color:#e8e8e8;font-weight:600}
+.lb-admin-row.is-admin .name{color:#e9d5ff}
+.lb-admin-row .name .star{color:#a855f7;margin-right:4px}
+.lb-admin-row .num{color:#00ffff;font-weight:700;text-align:right}
+.lb-admin-row.is-admin .num{color:#c084fc}
+.lb-admin-row .rank{text-align:center;font-weight:700}
+.lb-admin-row .uid{color:#666;font-size:11px}
+.lb-admin-row .ts{color:#4a7a7a;font-size:11px;text-align:right}
+.lb-admin-row .actions{display:flex;gap:4px;justify-content:flex-end}
+.lb-admin-row .actions .btn-sm{padding:4px 8px;font-size:10px}
+.lb-empty{padding:30px 20px;text-align:center;color:#444;font-size:12px;border:1px solid #1a1a1a}
+.toast{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#1a1a1a;border:1px solid #a855f7;color:#c084fc;padding:18px 26px;font-size:13px;z-index:99999;pointer-events:none;max-width:90vw;text-align:center;line-height:1.6}
+@media(max-width:700px){
+body{padding:12px 8px}
+.brand{font-size:12px}
+.brand-meta{font-size:10px}
+.user-chip{font-size:10px;padding:3px 8px}
+.user-chip .uid{font-size:9px}
+.logout-btn{font-size:10px;padding:3px 8px}
+.login-box{max-width:100%}
+.login-brand{font-size:17px;padding:24px 24px 6px 24px;letter-spacing:.2em}
+.login-sub{font-size:10px;margin-bottom:18px}
+.login-tab{font-size:11px;padding:12px;letter-spacing:.15em}
+.login-panel{padding:22px 22px 28px 22px}
+.login-field label{font-size:10px}
+.login-field input{padding:12px;font-size:14px}
+.login-btn{padding:13px;font-size:13px}
+.login-hint{font-size:9px}
+.view-title{font-size:12px;margin-bottom:12px}
+.view-title .sub{font-size:10px}
+.grid{grid-template-columns:1fr;gap:10px}
+.card{padding:14px}
+.card-name{font-size:13px}
+.card-desc{font-size:10px;min-height:auto;margin-bottom:8px}
+.card-score{font-size:26px}
+.card-foot{font-size:9px}
+.summary{padding:14px;flex-direction:column;align-items:flex-start;gap:12px}
+.summary-total{font-size:34px}
+.summary-info{font-size:10px}
+.summary-locked{font-size:10px;padding:6px 10px}
+.test-header{padding:10px 12px}
+.test-header-name{font-size:12px}
+.test-header-info{font-size:10px}
+.test-body{min-height:320px}
+.test-panel{height:320px}
+.test-panel .mt{font-size:22px;padding:0 14px}
+.test-panel .st{font-size:12px;padding:0 14px}
+.seq-grid{gap:3px;padding:3px}
+.num-display{font-size:52px}
+.num-input{padding:14px;font-size:20px}
+.color-grid{gap:6px;padding:6px}
+.test-foot{padding:10px 12px;font-size:10px}
+.test-foot .btn{padding:6px 12px !important;font-size:10px !important}
+.leaderboard-header{padding:10px 12px}
+.leaderboard-header-title{font-size:11px}
+.leaderboard-header-count{font-size:10px}
+.leaderboard-toggle{font-size:10px}
+.lb-row{grid-template-columns:36px 1fr 48px 40px;padding:10px 12px;font-size:11px;gap:6px}
+.lb-rank{font-size:12px}
+.lb-name{font-size:11px;gap:4px}
+.lb-name .uid{display:none}
+.lb-name .cnt{font-size:9px;padding:1px 5px}
+.lb-score{font-size:13px}
+.lb-grade{font-size:12px}
+.lb-ts{display:none}
+.lb-history-inner{padding:6px 12px 10px 12px;gap:6px}
+.lb-history-item{padding:4px 8px;font-size:10px}
+.modal{padding:18px}
+.modal-title{font-size:11px;letter-spacing:.2em;margin-bottom:12px;padding-bottom:10px}
+.modal-grid{grid-template-columns:1fr}
+.modal-field input,.modal-field textarea{font-size:13px;padding:10px}
+.modal-actions{gap:6px}
+.btn{padding:12px;font-size:12px}
+.mobile-tip{display:block}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div id="loginView" style="display:none">
+    <div class="login-wrap">
+      <div class="login-box">
+        <div class="login-brand" id="loginBrand"></div>
+        <div class="login-sub">LOGIN</div>
+        <div class="login-tabs">
+          <button class="login-tab active" data-tab="user" type="button">普通用户</button>
+          <button class="login-tab" data-tab="admin" type="button">★ 管理员</button>
+        </div>
+        <div class="login-panel" id="userLoginPanel">
+          <div class="login-field">
+            <label>名字 / NAME（仅英文，自动大写）</label>
+            <input type="text" id="userLoginName" maxlength="16" autocomplete="off" placeholder="例如: YUANSHEN" pattern="[A-Za-z]*">
+          </div>
+          <div class="login-field">
+            <label>密码 / PASSWORD</label>
+            <input type="password" id="userLoginKey" maxlength="64" autocomplete="off" placeholder="输入或设置你的密码" class="pwd">
+          </div>
+          <div class="login-error" id="userLoginError"></div>
+          <div class="login-btns">
+            <button class="login-btn" id="btnUserLogin" type="button">登 录</button>
+            <button class="login-btn ghost" id="btnUserRegister" type="button">注 册</button>
+          </div>
+          <div class="login-hint">
+            <b>首次使用</b>：填名字 + 自设密码，点【注册】<br>
+            <b>已有账号</b>：填名字 + 你的密码，点【登录】<br>
+            名字可重复，相同名字以不同密码区分账户
+          </div>
+        </div>
+        <div class="login-panel admin-mode" id="adminLoginPanel" style="display:none">
+          <div class="admin-badge"><span class="lock">⚠️</span>管理员 </div>
+          <div class="login-field">
+            <label>管理员名字</label>
+            <input type="text" id="adminLoginName" maxlength="16" autocomplete="off" placeholder="例如: ADMIN" pattern="[A-Za-z]*">
+          </div>
+          <div class="login-field">
+            <label>管理员密码</label>
+            <input type="password" id="adminLoginKey" maxlength="64" autocomplete="off" placeholder="请输入管理员密码" class="pwd">
+          </div>
+          <div class="login-error" id="adminLoginError"></div>
+          <button class="login-btn admin" id="btnAdminLogin" type="button" style="width:100%;margin-top:8px">管理员登录</button>
+          <div class="login-hint">此入口仅供管理员使用<br>普通用户请使用左侧「普通用户」入口</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="mainView" style="display:none">
+    <div class="brand-bar">
+      <div class="brand" id="brandEl"></div>
+      <div class="brand-right">
+        <span class="user-chip" id="userChip" style="display:none"></span>
+        <button class="logout-btn" id="btnLogout" type="button">登出</button>
+        <span class="brand-meta" id="brandMeta"></span>
+      </div>
+    </div>
+    <div class="mobile-tip" id="mobileTip" style="display:none">
+      📱 <b>手机端模式</b>：可测试反应时间、序列记忆、数字记忆、色觉辨识、听觉反应。<br>
+      瞄准测试、打字速度、追踪精度仅在电脑端可用。<br>
+      ⚠️ <b>成绩无法在手机端提交</b>，请完成测试后到电脑上登录同一账号上传。
+    </div>
+    <div id="gridView">
+      <div class="view-title"><span>测试项目</span><span class="sub" id="gridSub"></span></div>
+      <div class="grid" id="projectGrid"></div>
+      <div class="summary" id="summaryBox"></div>
+    </div>
+    <div id="testView" style="display:none">
+      <div class="test-area">
+        <div class="test-header">
+          <div class="test-header-name" id="testName">—</div>
+          <div class="test-header-info" id="testInfo"></div>
+        </div>
+        <div class="test-body" id="testBody"></div>
+        <div class="test-foot">
+          <button class="btn" id="btnQuit" type="button" style="flex:none;padding:8px 14px;font-size:11px">退出测试</button>
+          <span id="testFootInfo"></span>
+        </div>
+      </div>
+    </div>
+    <div class="leaderboard-section">
+      <div class="leaderboard-header" id="leaderboardHeader">
+        <div class="leaderboard-header-title">
+          <span>云端排行榜</span>
+          <span class="leaderboard-header-count" id="leaderboardCount">0 人</span>
+        </div>
+        <div class="leaderboard-toggle" id="leaderboardToggle">展开 ▾</div>
+      </div>
+      <div class="leaderboard-body collapsed" id="leaderboardBody"></div>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="modalOverlay" style="display:none"><div class="modal" id="modalBox"></div></div>
+
+<script>
+var SUPABASE_URL='https://kntnloooxwqdjcktucri.supabase.co';
+var SUPABASE_ANON_KEY='sb_publishable_PNIvkofsMG1-2gnsL4c1-w_zM4NrgUy';
+var supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+var DEFAULT_ADMIN_NAME='JUN';
+var DEFAULT_ADMIN_KEY='qwe33069908';
+var DEFAULT_ADMIN_ID='081031';
+
+var REGISTER_COOLDOWN_KEY='juntea_reg_cooldown_v1';
+var REGISTER_MIN_INTERVAL_MS=15000;
+var REGISTER_WINDOW_MS=600000;
+var REGISTER_MAX_IN_WINDOW=5;
+var REGISTER_BUTTON_LOCK_MS=2000;
+
+/* 手机端可玩的测试项 */
+var MOBILE_ALLOWED=['reaction','sequence','number','color','sound'];
+
+var TYPING_SAMPLES=[
+'The quick brown fox jumps over the lazy dog near the riverbank.',
+'Programming is the art of telling a computer what to do.',
+'A journey of a thousand miles begins with a single step.',
+'Time is the most valuable thing a person can spend wisely.',
+'Knowledge speaks but wisdom listens to the quiet world around us.',
+'Every great developer you know got there by solving problems.',
+'Simplicity is the ultimate sophistication in software design.',
+'The best way to predict the future is to invent it yourself.',
+'Code is like humor. When you have to explain it, it is bad.',
+'First solve the problem, then write the code carefully and slowly.',
+'Any fool can write code that a computer can understand.',
+'Good programmers write code that humans can easily understand.',
+'Experience is the name everyone gives to their past mistakes.',
+'The only way to learn a new programming language is by writing.',
+'Debugging is twice as hard as writing the code in the first place.',
+'Premature optimization is the root of all evil in programming.',
+'There are only two hard things in computer science: cache and naming.',
+'Weeks of coding can save you hours of planning every single time.',
+'The most disastrous thing you can ever learn is your first language.',
+'Make it work, make it right, make it fast, and then make it small.',
+'A ship in harbor is safe but that is not what ships are built for.',
+'Whether you think you can or you think you cannot, you are right.',
+'Success is not final and failure is not fatal, courage counts most.',
+'It does not matter how slowly you go as long as you do not stop.',
+'The future belongs to those who believe in the beauty of dreams.',
+'In the middle of difficulty lies opportunity waiting to be found.',
+'The only limit to our realization of tomorrow is our doubts today.',
+'You miss one hundred percent of the shots you do not take at all.',
+'Do not watch the clock, do what it does and keep going forward.',
+'Happiness is not something ready made, it comes from your actions.',
+'The mind is everything. What you think you will truly become.',
+'Challenges are what make life interesting and meaningful every day.',
+'Believe you can and you are already halfway to the final goal.',
+'The harder you work for something the greater you feel when done.',
+'You do not have to be great to start but you have to start.',
+'Dream big and dare to fail because failure teaches many lessons.',
+'The best time to plant a tree was twenty years ago, next is now.',
+'Your time is limited so do not waste it living someone else life.',
+'Stay hungry, stay foolish, and never stop exploring this world.',
+'Everything you have ever wanted is on the other side of fear.',
+'If you want to go fast go alone but if you want to go far go together.',
+'The secret of getting ahead is simply getting started right now.',
+'What we think we become is the most powerful sentence ever written.',
+'Quality is not an act, it is a habit built through many small steps.',
+'The journey is more important than the destination in every case.',
+'Life is what happens when you are busy making other plans ahead.',
+'Great things never come from comfort zones so step out and grow.',
+'Do not wait for the perfect moment, take the moment and make it.',
+'Learn from yesterday, live for today, hope for the bright tomorrow.'
+];
+
+var DEFAULT_GRADES='S 96\nA 90\nB 84\nC 78\nD 72\nE 66\nF 60\nG 54\nH 48\nI 42\nJ 36\nK 30\nL 24\nM 18\nN 12\nO 6\nP 0';
+var DEFAULT_CONFIG={
+  brandName:'Jun.Tea',brandMeta:'V2.1',
+  resultExpireMinutes:30,minTestsForTotal:5,maxLeaderboard:500,topDisplay:50,
+  configKey:'juntea_config_v6',sessionKey:'juntea_session_v6',currentUserKey:'juntea_user_v6',
+  allowSpaceKey:true,leaderboardDefaultOpen:true,showCardDesc:1,showTimestamp:1,
+  gradeLines:DEFAULT_GRADES,
+  projects:{
+    reaction:{enabled:1,weight:18,name:'反应时间',desc:'变绿后立即点击，共5次',trials:5,delayMin:1500,delayMax:4000,speedBase:150,speedFactor:0.4},
+    aim:{enabled:1,weight:18,name:'瞄准测试',desc:'快速点击随机出现的靶点，共30个',targets:30,timeLimitSec:60,baseMs:600,targetSize:40},
+    sequence:{enabled:1,weight:14,name:'序列记忆',desc:'记住方格亮起的顺序并复现',startLen:3,maxLen:12,showMs:600,gapMs:200},
+    number:{enabled:1,weight:14,name:'数字记忆',desc:'记住显示的数字并输入',startDigits:4,maxDigits:15,showMs:1500},
+    color:{enabled:1,weight:10,name:'色觉辨识',desc:'限时内找出颜色不同的方块',startLevel:1,maxLevel:20,timeLimitSec:60,wrongPenaltySec:1},
+    typing:{enabled:1,weight:10,name:'打字速度',desc:'尽快准确地打出给定文本',durationSec:60,baseWPM:40},
+    chase:{enabled:1,weight:8,name:'追踪精度',desc:'鼠标跟随移动中的目标，共20秒',durationSec:20,targetSize:60,speed:3},
+    sound:{enabled:1,weight:8,name:'听觉反应',desc:'听到提示音后立即点击',trials:5,delayMin:1500,delayMax:3500,speedBase:200,speedFactor:0.35}
+  }
+};
+var CONFIG_SCHEMA=[
+  {section:'基础参数'},
+  {key:'brandName',label:'品牌名称',type:'text'},
+  {key:'brandMeta',label:'品牌副标题',type:'text'},
+  {key:'resultExpireMinutes',label:'单项成绩有效期（分钟）',type:'number',min:1,max:1440},
+  {key:'minTestsForTotal',label:'生成综合成绩所需项目数',type:'number',min:1,max:20},
+  {key:'showCardDesc',label:'卡片显示描述（1/0）',type:'number',min:0,max:1},
+  {key:'showTimestamp',label:'排行榜显示时间（1/0）',type:'number',min:0,max:1},
+  {key:'leaderboardDefaultOpen',label:'排行榜默认展开（1/0）',type:'number',min:0,max:1},
+  {key:'maxLeaderboard',label:'最多读取条数',type:'number',min:10,max:5000},
+  {key:'topDisplay',label:'页面显示人数',type:'number',min:1,max:500},
+  {section:'等级定义'},
+  {key:'gradeLines',label:'每行：等级 最低分（从高到低）',type:'textarea',full:true}
+];
+var PROJECT_SCHEMA={
+  reaction:[{key:'name',label:'项目名称',type:'text'},{key:'desc',label:'项目描述',type:'text',full:true},{key:'weight',label:'权重',type:'number',min:0,max:100,step:0.5},{key:'trials',label:'测试次数',type:'number',min:1,max:50},{key:'delayMin',label:'延迟下限（毫秒）',type:'number',min:100,max:20000},{key:'delayMax',label:'延迟上限（毫秒）',type:'number',min:100,max:60000},{key:'speedBase',label:'速度基准（毫秒）',type:'number',min:50,max:500},{key:'speedFactor',label:'速度系数',type:'number',min:0,max:3,step:0.01},{key:'enabled',label:'启用（1/0）',type:'number',min:0,max:1}],
+  aim:[{key:'name',label:'项目名称',type:'text'},{key:'desc',label:'项目描述',type:'text',full:true},{key:'weight',label:'权重',type:'number',min:0,max:100,step:0.5},{key:'targets',label:'靶点数量',type:'number',min:1,max:200},{key:'timeLimitSec',label:'时间限制（秒）',type:'number',min:5,max:600},{key:'baseMs',label:'基准命中耗时（毫秒）',type:'number',min:100,max:3000},{key:'targetSize',label:'靶点大小（像素）',type:'number',min:16,max:120},{key:'enabled',label:'启用（1/0）',type:'number',min:0,max:1}],
+  sequence:[{key:'name',label:'项目名称',type:'text'},{key:'desc',label:'项目描述',type:'text',full:true},{key:'weight',label:'权重',type:'number',min:0,max:100,step:0.5},{key:'startLen',label:'起始序列长度',type:'number',min:1,max:20},{key:'maxLen',label:'最大序列长度',type:'number',min:2,max:30},{key:'showMs',label:'亮起时长（毫秒）',type:'number',min:100,max:3000},{key:'gapMs',label:'间隔时长（毫秒）',type:'number',min:50,max:2000},{key:'enabled',label:'启用（1/0）',type:'number',min:0,max:1}],
+  number:[{key:'name',label:'项目名称',type:'text'},{key:'desc',label:'项目描述',type:'text',full:true},{key:'weight',label:'权重',type:'number',min:0,max:100,step:0.5},{key:'startDigits',label:'起始位数',type:'number',min:1,max:20},{key:'maxDigits',label:'最大位数',type:'number',min:2,max:30},{key:'showMs',label:'显示时长（毫秒）',type:'number',min:300,max:10000},{key:'enabled',label:'启用（1/0）',type:'number',min:0,max:1}],
+  color:[{key:'name',label:'项目名称',type:'text'},{key:'desc',label:'项目描述',type:'text',full:true},{key:'weight',label:'权重',type:'number',min:0,max:100,step:0.5},{key:'startLevel',label:'起始关卡',type:'number',min:1,max:10},{key:'maxLevel',label:'最大关卡',type:'number',min:2,max:50},{key:'timeLimitSec',label:'时间限制（秒）',type:'number',min:5,max:600},{key:'wrongPenaltySec',label:'点错扣时（秒）',type:'number',min:0,max:30,step:0.5},{key:'enabled',label:'启用（1/0）',type:'number',min:0,max:1}],
+  typing:[{key:'name',label:'项目名称',type:'text'},{key:'desc',label:'项目描述',type:'text',full:true},{key:'weight',label:'权重',type:'number',min:0,max:100,step:0.5},{key:'durationSec',label:'时间限制（秒）',type:'number',min:10,max:600},{key:'baseWPM',label:'基准速度（WPM）',type:'number',min:10,max:200},{key:'enabled',label:'启用（1/0）',type:'number',min:0,max:1}],
+  chase:[{key:'name',label:'项目名称',type:'text'},{key:'desc',label:'项目描述',type:'text',full:true},{key:'weight',label:'权重',type:'number',min:0,max:100,step:0.5},{key:'durationSec',label:'测试时长（秒）',type:'number',min:5,max:120},{key:'targetSize',label:'目标大小（像素）',type:'number',min:20,max:200},{key:'speed',label:'移动速度（0.1~5）',type:'number',min:0.1,max:5,step:0.1},{key:'enabled',label:'启用（1/0）',type:'number',min:0,max:1}],
+  sound:[{key:'name',label:'项目名称',type:'text'},{key:'desc',label:'项目描述',type:'text',full:true},{key:'weight',label:'权重',type:'number',min:0,max:100,step:0.5},{key:'trials',label:'测试次数',type:'number',min:1,max:50},{key:'delayMin',label:'延迟下限（毫秒）',type:'number',min:100,max:20000},{key:'delayMax',label:'延迟上限（毫秒）',type:'number',min:100,max:60000},{key:'speedBase',label:'速度基准（毫秒）',type:'number',min:50,max:500},{key:'speedFactor',label:'速度系数',type:'number',min:0,max:3,step:0.01},{key:'enabled',label:'启用（1/0）',type:'number',min:0,max:1}]
+};
+
+function deepMerge(base,override){var out=Object.assign({},base);if(!override)return out;for(var k in override){if(override[k]&&typeof override[k]==='object'&&!Array.isArray(override[k])&&base[k]&&typeof base[k]==='object'){out[k]=deepMerge(base[k],override[k]);}else out[k]=override[k];}return out;}
+function loadConfig(){var stored=null;try{var raw=localStorage.getItem(DEFAULT_CONFIG.configKey);if(raw)stored=JSON.parse(raw);}catch(e){}return deepMerge(DEFAULT_CONFIG,stored||{});}
+function saveConfig(){try{localStorage.setItem(CONFIG.configKey,JSON.stringify(CONFIG));}catch(e){}}
+var CONFIG=loadConfig();
+
+function parseGrades(text){var out=[];String(text).split('\n').forEach(function(l){var t=l.trim();if(!t)return;var p=t.split(/\s+/);if(p.length<2)return;var m=parseFloat(p[1]);if(isNaN(m))return;out.push({name:p[0],min:m});});out.sort(function(a,b){return b.min-a.min;});if(out.length===0)out.push({name:'—',min:0});return out;}
+var GRADES=parseGrades(CONFIG.gradeLines);
+function getGrade(s){for(var i=0;i<GRADES.length;i++)if(s>=GRADES[i].min)return GRADES[i].name;return GRADES[GRADES.length-1].name;}
+function gradeColor(name){var idx=-1;for(var i=0;i<GRADES.length;i++)if(GRADES[i].name===name){idx=i;break;}if(idx<0)return '#888';var t=GRADES.length>1?idx/(GRADES.length-1):0;return 'hsl('+(180-t*180).toFixed(1)+','+(100-t*60).toFixed(1)+'%,'+(60-t*18).toFixed(1)+'%)';}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function renderBrand(name){var p=String(name).split('.');if(p.length===2)return escapeHtml(p[0])+'<span class="dot">.</span>'+escapeHtml(p[1]);return escapeHtml(name);}
+function formatTs(ts){if(!ts)return '—';var d=new Date(ts);var pad=function(n,w){w=w||2;var s=String(n);while(s.length<w)s='0'+s;return s;};return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());}
+function formatTsShort(ts){if(!ts)return '—';var d=new Date(ts);var pad=function(n){return n<10?'0'+n:''+n;};return (d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());}
+function showToast(m,d){var el=document.createElement('div');el.className='toast';el.textContent=m;document.body.appendChild(el);setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},d||1800);}
+function genUserId(){var c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',id='U';for(var i=0;i<8;i++)id+=c[Math.floor(Math.random()*c.length)];return id;}
+function simpleHash(str){var h1=5381>>>0,h2=52711>>>0;for(var i=0;i<str.length;i++){var c=str.charCodeAt(i);h1=((h1*33)^c)>>>0;h2=((h2*31)+c)>>>0;}return h1.toString(16).padStart(8,'0')+h2.toString(16).padStart(8,'0');}
+function userKeyHash(name,key){return simpleHash('USER|'+name+'|'+key+'|juntea');}
+function normalizeName(raw){var s=String(raw||'').toUpperCase();return s.replace(/[^A-Z]/g,'');}
+
+/* ========== 移动端检测 ========== */
+function isMobileDevice(){
+  if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent))return true;
+  if(navigator.maxTouchPoints>1&&window.innerWidth<900)return true;
+  return false;
+}
+var IS_MOBILE=isMobileDevice();
+function isProjectAvailableOnMobile(key){return MOBILE_ALLOWED.indexOf(key)>=0;}
+
+/* ========== 注册冷却 ========== */
+function checkRegisterCooldown(){
+  var data=[];
+  try{var raw=localStorage.getItem(REGISTER_COOLDOWN_KEY);if(raw)data=JSON.parse(raw);if(!Array.isArray(data))data=[];}catch(e){data=[];}
+  var now=Date.now();
+  data=data.filter(function(t){return typeof t==='number'&&now-t<3600000;});
+  if(data.length>0){
+    var last=data[data.length-1];
+    if(now-last<REGISTER_MIN_INTERVAL_MS){
+      var wait=Math.ceil((REGISTER_MIN_INTERVAL_MS-(now-last))/1000);
+      return {ok:false,msg:'注册过于频繁，请 '+wait+' 秒后再试',data:data};
+    }
+  }
+  var recent=data.filter(function(t){return now-t<REGISTER_WINDOW_MS;});
+  if(recent.length>=REGISTER_MAX_IN_WINDOW){
+    var wait2=Math.ceil((REGISTER_WINDOW_MS-(now-recent[0]))/1000);
+    var minutes=Math.ceil(wait2/60);
+    return {ok:false,msg:'该设备注册过于频繁，请约 '+minutes+' 分钟后再试',data:data};
+  }
+  return {ok:true,msg:'',data:data};
+}
+function recordRegisterTime(){
+  var r=checkRegisterCooldown();
+  var data=r.data||[];
+  data.push(Date.now());
+  try{localStorage.setItem(REGISTER_COOLDOWN_KEY,JSON.stringify(data));}catch(e){}
+}
+
+var brandEl=document.getElementById('brandEl'),brandMeta=document.getElementById('brandMeta');
+var loginView=document.getElementById('loginView'),mainView=document.getElementById('mainView');
+var loginBrand=document.getElementById('loginBrand');
+var userLoginPanel=document.getElementById('userLoginPanel'),adminLoginPanel=document.getElementById('adminLoginPanel');
+var userLoginName=document.getElementById('userLoginName'),userLoginKey=document.getElementById('userLoginKey'),userLoginError=document.getElementById('userLoginError');
+var adminLoginName=document.getElementById('adminLoginName'),adminLoginKey=document.getElementById('adminLoginKey'),adminLoginError=document.getElementById('adminLoginError');
+var btnUserLogin=document.getElementById('btnUserLogin'),btnUserRegister=document.getElementById('btnUserRegister'),btnAdminLogin=document.getElementById('btnAdminLogin');
+var userChip=document.getElementById('userChip'),btnLogout=document.getElementById('btnLogout');
+var gridView=document.getElementById('gridView'),testView=document.getElementById('testView');
+var projectGrid=document.getElementById('projectGrid'),gridSub=document.getElementById('gridSub'),summaryBox=document.getElementById('summaryBox');
+var testName=document.getElementById('testName'),testInfo=document.getElementById('testInfo');
+var testBody=document.getElementById('testBody'),testFootInfo=document.getElementById('testFootInfo'),btnQuit=document.getElementById('btnQuit');
+var leaderboardHeader=document.getElementById('leaderboardHeader'),leaderboardBody=document.getElementById('leaderboardBody');
+var leaderboardCount=document.getElementById('leaderboardCount'),leaderboardToggle=document.getElementById('leaderboardToggle');
+var modalOverlay=document.getElementById('modalOverlay'),modalBox=document.getElementById('modalBox');
+var mobileTip=document.getElementById('mobileTip');
+
+var currentUser=null,currentTest=null,currentCleanup=null;
+var leaderboardOpen=!!CONFIG.leaderboardDefaultOpen;
+var brandClickCount=0,brandClickTimer=null,lastSavedId=null;
+var cloudLeaderboardCache=[];
+var expandedGroups={};
+
+userLoginName.addEventListener('input',function(){this.value=normalizeName(this.value);});
+adminLoginName.addEventListener('input',function(){this.value=normalizeName(this.value);});
+
+var loginTabs=document.querySelectorAll('.login-tab');
+for(var i=0;i<loginTabs.length;i++){
+  (function(tab){
+    tab.addEventListener('click',function(){
+      for(var j=0;j<loginTabs.length;j++)loginTabs[j].classList.remove('active');
+      tab.classList.add('active');
+      var t=tab.getAttribute('data-tab');
+      userLoginPanel.style.display=(t==='user')?'block':'none';
+      adminLoginPanel.style.display=(t==='admin')?'block':'none';
+      userLoginError.textContent='';adminLoginError.textContent='';
+      if(t==='user')setTimeout(function(){userLoginName.focus();},50);
+      else setTimeout(function(){adminLoginName.focus();},50);
+    });
+  })(loginTabs[i]);
+}
+
+function renderLogin(){
+  loginBrand.innerHTML=renderBrand(CONFIG.brandName);
+  loginView.style.display='block';mainView.style.display='none';
+  userLoginName.value='';userLoginKey.value='';userLoginError.textContent='';
+  adminLoginName.value='';adminLoginKey.value='';adminLoginError.textContent='';
+  setTimeout(function(){userLoginName.focus();},50);
+}
+
+async function doUserRegister(){
+  var name=normalizeName(userLoginName.value);
+  var key=userLoginKey.value.trim();
+  userLoginError.textContent='';
+  userLoginName.value=name;
+  if(!name){userLoginError.textContent='请输入名字（仅英文字母）';userLoginName.focus();return;}
+  if(name.length<2){userLoginError.textContent='名字至少 2 个字母';return;}
+  if(!key){userLoginError.textContent='请设置你的密码';userLoginKey.focus();return;}
+  if(key.length<4){userLoginError.textContent='密码至少 4 位';return;}
+  if(name===DEFAULT_ADMIN_NAME){userLoginError.textContent='此名字已被管理员占用';return;}
+  var cd=checkRegisterCooldown();
+  if(!cd.ok){userLoginError.textContent=cd.msg;return;}
+  var keyHash=userKeyHash(name,key);
+  var checkRes=await supabase.from('users').select('*').eq('name',name).eq('key_hash',keyHash);
+  if(checkRes.error){userLoginError.textContent='网络错误：'+checkRes.error.message;return;}
+  if(checkRes.data&&checkRes.data.length>0){userLoginError.textContent='这个名字 + 密码已注册过，请直接点【登录】';return;}
+  var newId=genUserId();
+  var insRes=await supabase.from('users').insert([{id:newId,name:name,key_hash:keyHash,is_admin:false,created_ts:Date.now()}]);
+  if(insRes.error){userLoginError.textContent='注册失败：'+insRes.error.message;return;}
+  recordRegisterTime();
+  alert('注册成功！\n\n你的名字：'+name+'\n你的 ID：'+newId+'\n\n以后请用「名字 + 密码」登录，换设备也一样。\n注意：密码是你刚才设置的，忘记了无法找回。');
+  currentUser={name:name,id:newId,isAdmin:false,loginTs:Date.now()};
+  saveCurrentUser(currentUser);
+  enterMain();
+}
+
+async function doUserLogin(){
+  var name=normalizeName(userLoginName.value);
+  var key=userLoginKey.value.trim();
+  userLoginError.textContent='';
+  userLoginName.value=name;
+  if(!name){userLoginError.textContent='请输入名字';userLoginName.focus();return;}
+  if(!key){userLoginError.textContent='请输入你的密码';userLoginKey.focus();return;}
+  if(name===DEFAULT_ADMIN_NAME){userLoginError.textContent='此名字已被管理员占用';return;}
+  var keyHash=userKeyHash(name,key);
+  var res=await supabase.from('users').select('*').eq('name',name).eq('key_hash',keyHash);
+  if(res.error){userLoginError.textContent='网络错误：'+res.error.message;return;}
+  if(!res.data||res.data.length===0){userLoginError.textContent='名字或密码错误，或账号不存在（首次请点【注册】）';return;}
+  var u=res.data[0];
+  if(u.is_admin){userLoginError.textContent='这是管理员账号，请用管理员入口登录';return;}
+  currentUser={name:name,id:u.id,isAdmin:false,loginTs:Date.now()};
+  saveCurrentUser(currentUser);
+  enterMain();
+}
+
+async function doAdminLogin(){
+  var name=normalizeName(adminLoginName.value);
+  var key=adminLoginKey.value.trim();
+  adminLoginError.textContent='';
+  adminLoginName.value=name;
+  if(!name){adminLoginError.textContent='请输入管理员名字';adminLoginName.focus();return;}
+  if(!key){adminLoginError.textContent='请输入管理员密码';adminLoginKey.focus();return;}
+  if(name===DEFAULT_ADMIN_NAME&&key===DEFAULT_ADMIN_KEY){
+    currentUser={name:name,id:DEFAULT_ADMIN_ID,isAdmin:true,loginTs:Date.now()};
+    saveCurrentUser(currentUser);enterMain();return;
+  }
+  var res=await supabase.from('users').select('*').eq('name',name).eq('is_admin',true);
+  if(res.error){adminLoginError.textContent='网络错误：'+res.error.message;return;}
+  if(!res.data||res.data.length===0){adminLoginError.textContent='管理员不存在或密码错误';return;}
+  var u=res.data[0];
+  if(u.key_hash!==userKeyHash(name,key)){adminLoginError.textContent='管理员密码错误';return;}
+  currentUser={name:name,id:u.id,isAdmin:true,loginTs:Date.now()};
+  saveCurrentUser(currentUser);
+  enterMain();
+}
+function saveCurrentUser(u){try{localStorage.setItem(CONFIG.currentUserKey,JSON.stringify(u));}catch(e){}}
+function loadCurrentUser(){try{var r=localStorage.getItem(CONFIG.currentUserKey);return r?JSON.parse(r):null;}catch(e){return null;}}
+function enterMain(){
+  loginView.style.display='none';mainView.style.display='block';
+  renderUserChip();
+  brandEl.innerHTML=renderBrand(CONFIG.brandName);
+  brandMeta.textContent=CONFIG.brandMeta;
+  document.title=CONFIG.brandName+' · 综合反应测试';
+  GRADES=parseGrades(CONFIG.gradeLines);
+  if(IS_MOBILE)mobileTip.style.display='block';
+  showGridView();
+  fetchCloudLeaderboard();
+}
+function renderUserChip(){if(!currentUser)return;var cls=currentUser.isAdmin?'user-chip admin':'user-chip';var star=currentUser.isAdmin?'<span class="star">★</span>':'';userChip.className=cls;userChip.innerHTML=star+'<span>'+escapeHtml(currentUser.name)+'</span><span class="uid">#'+escapeHtml(currentUser.id)+'</span>';userChip.style.display='inline-flex';}
+function doLogout(){if(!confirm('确认登出？'))return;localStorage.removeItem(CONFIG.currentUserKey);currentUser=null;userChip.style.display='none';renderLogin();}
+
+var registerBtnLock=false;
+btnUserRegister.addEventListener('click',async function(){
+  if(registerBtnLock)return;
+  registerBtnLock=true;
+  var old=btnUserRegister.textContent;
+  btnUserRegister.disabled=true;
+  btnUserRegister.textContent='处理中';
+  try{ await doUserRegister(); }
+  finally{
+    setTimeout(function(){registerBtnLock=false;btnUserRegister.disabled=false;btnUserRegister.textContent=old;},REGISTER_BUTTON_LOCK_MS);
+  }
+});
+btnUserLogin.addEventListener('click',doUserLogin);
+btnAdminLogin.addEventListener('click',doAdminLogin);
+userLoginName.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();userLoginKey.focus();}});
+userLoginKey.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doUserLogin();}});
+adminLoginName.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();adminLoginKey.focus();}});
+adminLoginKey.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();doAdminLogin();}});
+btnLogout.addEventListener('click',doLogout);
+
+async function fetchCloudLeaderboard(){
+  leaderboardBody.innerHTML='<div class="lb-empty">加载中...</div>';
+  try{
+    var res=await supabase.from('leaderboard').select('*').order('score',{ascending:false}).limit(CONFIG.maxLeaderboard);
+    if(res.error){leaderboardBody.innerHTML='<div class="lb-empty">读取失败：'+escapeHtml(res.error.message)+'</div>';return;}
+    cloudLeaderboardCache=res.data||[];
+    refreshLeaderboardDisplay();
+  }catch(e){leaderboardBody.innerHTML='<div class="lb-empty">网络异常：'+escapeHtml(String(e.message||e))+'</div>';}
+}
+async function addToLeaderboard(entry){
+  try{
+    var res=await supabase.from('leaderboard').insert([{id:entry.id,name:entry.name,user_id:entry.userId,is_admin:entry.isAdmin,score:entry.score,rank:entry.rank,projects:entry.projects,ts:entry.ts}]);
+    if(res.error){alert('保存失败：'+res.error.message);return false;}
+    lastSavedId=entry.id;
+    await fetchCloudLeaderboard();
+    return true;
+  }catch(e){alert('网络异常：'+e.message);return false;}
+}
+function groupByUser(list){
+  var map={};
+  (list||[]).forEach(function(item){
+    var key=item.user_id||item.id||item.name;
+    if(!map[key])map[key]={userId:key,name:item.name,isAdmin:!!item.is_admin,records:[]};
+    map[key].records.push(item);
+  });
+  var groups=Object.keys(map).map(function(k){var g=map[k];g.records.sort(function(a,b){return b.score-a.score;});g.best=g.records[0];return g;});
+  groups.sort(function(a,b){return b.best.score-a.best.score;});
+  return groups;
+}
+function refreshLeaderboardDisplay(hid){
+  var list=cloudLeaderboardCache||[];
+  var groups=groupByUser(list);
+  leaderboardCount.textContent=groups.length+' 人';
+  leaderboardBody.innerHTML=renderLeaderboardHtml(groups,hid||lastSavedId);
+  applyLeaderboardOpenState();
+}
+function renderLeaderboardHtml(groups,hid){
+  if(!groups||groups.length===0)return '<div class="lb-empty">暂无记录</div>';
+  var showTs=!!CONFIG.showTimestamp;
+  var top=groups.slice(0,CONFIG.topDisplay);
+  return top.map(function(g,index){
+    var c=gradeColor(g.best.rank);
+    var cls='lb-group';
+    if(index===0)cls+=' rank-1';else if(index===1)cls+=' rank-2';else if(index===2)cls+=' rank-3';
+    if(g.isAdmin)cls+=' is-admin';
+    var isMe=hid&&g.records.some(function(r){return r.id===hid;});
+    if(isMe)cls+=' is-me';
+    var star=g.isAdmin?'<span class="star">★</span>':'';
+    var uid='<span class="uid">#'+escapeHtml(g.userId)+'</span>';
+    var cnt=g.records.length;
+    var cntHtml=cnt>1?'<span class="cnt">'+cnt+'次</span>':'';
+    var arrow=cnt>1?'<span class="toggle-arrow">▾</span>':'';
+    var expanded=!!expandedGroups[g.userId];
+    var row='<div class="lb-row" data-uid="'+escapeHtml(g.userId)+'">'+
+      '<div class="lb-rank">#'+(index+1)+'</div>'+
+      '<div class="lb-name">'+star+escapeHtml(g.name)+uid+cntHtml+arrow+'</div>'+
+      '<div class="lb-score">'+g.best.score+'</div>'+
+      '<div class="lb-grade" style="color:'+c+'">'+escapeHtml(g.best.rank)+'</div>'+
+      (showTs?'<div class="lb-ts">'+formatTs(g.best.ts)+'</div>':'<div class="lb-ts"></div>')+
+    '</div>';
+    var hist='';
+    if(cnt>1){
+      var items=g.records.map(function(r,i){
+        var rc=gradeColor(r.rank);
+        var isBest=(i===0);
+        return '<div class="lb-history-item'+(isBest?' is-best':'')+'">'+
+          '<span class="sc">'+r.score+'</span>'+
+          '<span class="rk" style="color:'+rc+'">'+escapeHtml(r.rank)+'</span>'+
+          '<span class="tm">'+formatTsShort(r.ts)+'</span>'+
+        '</div>';
+      }).join('');
+      hist='<div class="lb-history'+(expanded?'':' collapsed')+'"><div class="lb-history-inner">'+items+'</div></div>';
+    }
+    return '<div class="'+cls+'">'+row+hist+'</div>';
+  }).join('');
+}
+function applyLeaderboardOpenState(){if(leaderboardOpen){leaderboardBody.classList.remove('collapsed');leaderboardToggle.textContent='收起 ▴';}else{leaderboardBody.classList.add('collapsed');leaderboardToggle.textContent='展开 ▾';}}
+leaderboardHeader.addEventListener('click',function(){leaderboardOpen=!leaderboardOpen;applyLeaderboardOpenState();});
+leaderboardBody.addEventListener('click',function(e){
+  var row=e.target.closest?e.target.closest('.lb-row'):null;
+  if(!row)return;
+  var uid=row.getAttribute('data-uid');
+  if(!uid)return;
+  expandedGroups[uid]=!expandedGroups[uid];
+  refreshLeaderboardDisplay();
+});
+
+function loadSession(){try{var r=localStorage.getItem(CONFIG.sessionKey);return r?JSON.parse(r):{};}catch(e){return {};}}
+function saveSession(s){try{localStorage.setItem(CONFIG.sessionKey,JSON.stringify(s));}catch(e){}}
+function purgeExpiredSession(){var s=loadSession();var now=Date.now();var m=CONFIG.resultExpireMinutes*60*1000;var ch=false;for(var k in s){var e=s[k];if(!e||typeof e.ts!=='number'||(now-e.ts)>m){delete s[k];ch=true;}}if(ch)saveSession(s);return s;}
+function recordProjectResult(key,score,data){var s=purgeExpiredSession();s[key]={score:Math.round(score),ts:Date.now(),data:data||{}};saveSession(s);}
+function isExpired(e){if(!e||typeof e.ts!=='number')return true;return (Date.now()-e.ts)>CONFIG.resultExpireMinutes*60*1000;}
+function remainingMinutes(e){if(!e||typeof e.ts!=='number')return 0;return Math.max(0,Math.floor(((CONFIG.resultExpireMinutes*60*1000)-(Date.now()-e.ts))/60000));}
+function getEnabledProjects(){
+  var o=[];
+  for(var k in CONFIG.projects){
+    if(CONFIG.projects[k]&&CONFIG.projects[k].enabled){
+      if(IS_MOBILE&&!isProjectAvailableOnMobile(k))continue;
+      o.push(k);
+    }
+  }
+  return o;
+}
+function computeTotal(){
+  var s=purgeExpiredSession();var en=getEnabledProjects();var tw=0,ws=0;var items=[];
+  en.forEach(function(k){var e=s[k],p=CONFIG.projects[k];if(e&&!isExpired(e)){ws+=e.score*p.weight;tw+=p.weight;items.push({key:k,score:e.score,weight:p.weight});}});
+  var req=CONFIG.minTestsForTotal;
+  if(IS_MOBILE&&req>en.length)req=en.length;
+  var ready=items.length>=req;
+  if(tw<=0||!ready)return{total:0,grade:'—',items:items,tested:items.length,totalCount:en.length,ready:false,required:req,need:Math.max(0,req-items.length)};
+  var total=Math.round(ws/tw);
+  return{total:total,grade:getGrade(total),items:items,tested:items.length,totalCount:en.length,ready:true,required:req,need:0};
+}
+
+function makeTestPanel(cls,mt,st){var d=document.createElement('div');d.className='test-panel '+cls;var a=document.createElement('div');a.className='mt';a.textContent=mt;var b=document.createElement('div');b.className='st';b.textContent=st||'';d.appendChild(a);d.appendChild(b);return d;}
+var TESTS={};
+
+TESTS.reaction={start:function(area,finish){
+  var p=CONFIG.projects.reaction;var state={mode:'idle',times:[],timer:null,startT:null};
+  var panel=makeTestPanel('','点击开始','共 '+p.trials+' 次');area.appendChild(panel);
+  function next(){state.mode='waiting';panel.className='test-panel w';panel.querySelector('.mt').textContent='等待绿色';panel.querySelector('.st').textContent='变绿后立即点击';
+    state.timer=setTimeout(function(){state.mode='ready';panel.className='test-panel r';panel.querySelector('.mt').textContent='点击';panel.querySelector('.st').textContent='';state.startT=null;
+      requestAnimationFrame(function(){requestAnimationFrame(function(){if(state.mode==='ready')state.startT=performance.now();});});},p.delayMin+Math.random()*(p.delayMax-p.delayMin));}
+  function handler(e){
+    if(e.pointerType==='mouse'&&e.button!==0)return;
+    if(state.mode==='idle'){next();return;}
+    if(state.mode==='waiting'){clearTimeout(state.timer);state.mode='idle';panel.className='test-panel e';panel.querySelector('.mt').textContent='过早点击';panel.querySelector('.st').textContent='点击重试';return;}
+    if(state.mode==='ready'){
+      if(state.startT===null)return;
+      var t=Math.round(performance.now()-state.startT);state.times.push(t);
+      if(state.times.length>=p.trials){
+        var avg=state.times.reduce(function(a,b){return a+b;},0)/state.times.length;
+        var score=Math.max(0,Math.min(100,100-(avg-p.speedBase)*p.speedFactor));
+        state.mode='done';panel.className='test-panel s';panel.querySelector('.mt').textContent='完成';panel.querySelector('.st').textContent='平均 '+Math.round(avg)+'ms';
+        setTimeout(function(){finish(Math.round(score),{times:state.times,avg:Math.round(avg)});},900);return;
+      }
+      state.mode='idle';panel.className='test-panel s';panel.querySelector('.mt').textContent=t+'ms';panel.querySelector('.st').textContent='('+state.times.length+'/'+p.trials+')';
+      setTimeout(next,700);
+    }
+  }
+  panel.addEventListener('pointerdown',handler);
+  currentCleanup=function(){clearTimeout(state.timer);panel.removeEventListener('pointerdown',handler);};
+}};
+
+TESTS.aim={start:function(area,finish){
+  var p=CONFIG.projects.aim;var state={hits:0,times:[],active:null,timer:null,done:false,lastSpawn:0};
+  var body=document.createElement('div');body.className='test-panel';body.style.cssText='cursor:default;padding:0;position:relative;overflow:hidden';
+  var intro=document.createElement('div');intro.style.textAlign='center';intro.innerHTML='<div class="mt">点击开始</div><div class="st">共 '+p.targets+' 个靶点 · '+p.timeLimitSec+' 秒</div>';
+  body.appendChild(intro);area.appendChild(body);
+  var infoEl=document.createElement('div');infoEl.style.cssText='position:absolute;top:10px;left:14px;font-size:12px;color:#666;pointer-events:none;z-index:5';infoEl.textContent='命中 0 / '+p.targets;
+  var timerEl=document.createElement('div');timerEl.style.cssText='position:absolute;top:10px;right:14px;font-size:12px;color:#00ffff;font-weight:700;pointer-events:none;z-index:5';timerEl.textContent=p.timeLimitSec+' 秒';
+  var startTs=null,timeLeft=p.timeLimitSec;
+  function removeTarget(){if(state.active&&state.active.parentNode)state.active.parentNode.removeChild(state.active);state.active=null;}
+  function spawn(){
+    removeTarget();if(state.done)return;if(state.hits>=p.targets){finishRound();return;}
+    var sz=p.targetSize;var t=document.createElement('div');t.className='aim-target';
+    t.style.width=sz+'px';t.style.height=sz+'px';t.style.fontSize=Math.max(10,sz/3)+'px';t.textContent=state.hits+1;
+    var w=body.clientWidth,h=body.clientHeight,pad=6;
+    t.style.left=(pad+Math.random()*Math.max(1,w-sz-pad*2))+'px';t.style.top=(pad+Math.random()*Math.max(1,h-sz-pad*2))+'px';
+    t.addEventListener('pointerdown',function(e){
+      if(e.pointerType==='mouse'&&e.button!==0)return;e.stopPropagation();
+      state.times.push(performance.now()-state.lastSpawn);state.hits++;removeTarget();
+      infoEl.textContent='命中 '+state.hits+' / '+p.targets;
+      if(state.hits>=p.targets){finishRound();return;}spawn();
+    });
+    body.appendChild(t);state.active=t;state.lastSpawn=performance.now();
+  }
+  function finishRound(){
+    if(state.done)return;state.done=true;if(state.timer)clearInterval(state.timer);removeTarget();
+    var avg=state.times.length>0?state.times.reduce(function(a,b){return a+b;},0)/state.times.length:9999;
+    var hr=state.hits/p.targets;var score=0;
+    if(state.hits>0){var ss=Math.max(0,Math.min(100,100-(avg-p.baseMs)/8));score=Math.round(ss*0.7+hr*100*0.3);}
+    body.innerHTML='<div class="mt" style="color:#fff">完成 '+state.hits+' / '+p.targets+'</div><div class="st">平均 '+Math.round(avg)+'ms · 得分 '+score+'</div>';
+    setTimeout(function(){finish(score,{hits:state.hits,avg:Math.round(avg)});},1000);
+  }
+  function handler(e){
+    if(startTs!==null)return;if(e.pointerType==='mouse'&&e.button!==0)return;
+    startTs=performance.now();state.hits=0;state.times=[];state.done=false;
+    body.innerHTML='';body.appendChild(infoEl);body.appendChild(timerEl);body.style.cursor='crosshair';
+    infoEl.textContent='命中 0 / '+p.targets;timerEl.textContent=timeLeft+' 秒';spawn();
+    state.timer=setInterval(function(){if(state.done)return;timeLeft--;timerEl.textContent=Math.max(0,timeLeft)+' 秒';if(timeLeft<=0)finishRound();},1000);
+  }
+  body.addEventListener('pointerdown',handler);
+  currentCleanup=function(){if(state.timer)clearInterval(state.timer);body.removeEventListener('pointerdown',handler);removeTarget();};
+}};
+
+TESTS.sequence={start:function(area,finish){
+  var p=CONFIG.projects.sequence;var SIZE=4;var state={seq:[],user:[],max:0,active:false,phase:'intro'};
+  var wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:16px;padding:20px';
+  var info=document.createElement('div');info.className='mt';info.style.fontSize='18px';info.style.color='#fff';info.textContent='点击开始';wrap.appendChild(info);
+  var grid=document.createElement('div');grid.className='seq-grid';
+  var cellSize=70;
+  if(window.innerWidth<700)cellSize=Math.min(58,Math.floor((window.innerWidth-70)/4));
+  grid.style.gridTemplateColumns='repeat('+SIZE+','+cellSize+'px)';
+  var cells=[];for(var i=0;i<SIZE*SIZE;i++){var c=document.createElement('div');c.className='seq-cell';c.style.width=cellSize+'px';c.style.height=cellSize+'px';c.dataset.i=i;cells.push(c);grid.appendChild(c);}
+  wrap.appendChild(grid);area.appendChild(wrap);
+  function flash(idx,cls,ms){return new Promise(function(res){cells[idx].classList.add(cls);setTimeout(function(){cells[idx].classList.remove(cls);res();},ms);});}
+  function nextRound(){
+    state.seq.push(Math.floor(Math.random()*SIZE*SIZE));state.user=[];state.active=false;
+    info.textContent='观察序列 ('+state.seq.length+' 步)';var i=0;
+    function pn(){if(i>=state.seq.length){state.active=true;info.textContent='请复现顺序 (0/'+state.seq.length+')';return;}flash(state.seq[i],'on',p.showMs).then(function(){setTimeout(function(){i++;pn();},p.gapMs);});}
+    setTimeout(pn,600);
+  }
+  function handleClick(){
+    if(state.phase==='intro'){state.phase='play';state.seq=[];state.max=0;nextRound();return;}
+    if(!state.active)return;
+    var idx=parseInt(this.dataset.i,10);flash(idx,'ok',150);state.user.push(idx);var n=state.user.length;
+    if(state.user[n-1]!==state.seq[n-1]){state.active=false;state.max=Math.max(state.max,state.seq.length-1);info.textContent='错误！最高 '+state.max+' 步';setTimeout(function(){var s=Math.min(100,Math.round(state.max*(100/p.maxLen)));finish(s,{maxSeq:state.max});},1200);return;}
+    if(n===state.seq.length){state.max=Math.max(state.max,state.seq.length);state.active=false;info.textContent='正确！下一轮...';if(state.seq.length>=p.maxLen){setTimeout(function(){finish(100,{maxSeq:state.max});},800);return;}setTimeout(nextRound,900);}
+    else info.textContent='请复现顺序 ('+n+'/'+state.seq.length+')';
+  }
+  cells.forEach(function(c){c.addEventListener('click',handleClick);});
+  currentCleanup=function(){};
+}};
+
+TESTS.number={start:function(area,finish){
+  var p=CONFIG.projects.number;var wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:20px;padding:20px;width:100%';
+  var info=document.createElement('div');info.className='mt';info.style.fontSize='16px';info.textContent='点击开始';
+  var disp=document.createElement('div');disp.className='num-display';disp.style.display='none';
+  var input=document.createElement('input');input.className='num-input';input.style.display='none';input.type='text';input.inputMode='numeric';input.autocomplete='off';
+  var btn=document.createElement('button');btn.className='btn btn-primary';btn.style.cssText='flex:none;padding:12px 30px';btn.textContent='开始';
+  wrap.appendChild(info);wrap.appendChild(disp);wrap.appendChild(input);wrap.appendChild(btn);area.appendChild(wrap);
+  var state={phase:'intro',digits:p.startDigits,max:0,current:''};
+  btn.addEventListener('click',function(){if(state.phase==='intro'){state.phase='show';state.digits=p.startDigits;state.max=0;nextRound();}});
+  function nextRound(){
+    state.current='';for(var i=0;i<state.digits;i++)state.current+=Math.floor(Math.random()*10);
+    disp.textContent=state.current;disp.style.display='block';input.style.display='none';input.value='';btn.style.display='none';info.textContent='记住数字';
+    setTimeout(function(){disp.style.display='none';input.style.display='block';input.focus();info.textContent='请输入刚才的数字（'+state.digits+' 位）';},p.showMs);
+  }
+  input.addEventListener('keydown',function(e){
+    if(e.key!=='Enter')return;e.preventDefault();
+    if(input.value.trim()===state.current){
+      state.max=state.digits;
+      if(state.digits>=p.maxDigits){finish(100,{maxDigits:state.max});return;}
+      state.digits++;info.textContent='正确！下一轮 '+state.digits+' 位';setTimeout(nextRound,700);
+    }else{info.textContent='错误！正确是 '+state.current+'，最高 '+state.max+' 位';var s=Math.min(100,Math.round(state.max*100/p.maxDigits));setTimeout(function(){finish(s,{maxDigits:state.max});},1400);}
+  });
+  currentCleanup=function(){};
+}};
+
+TESTS.color={start:function(area,finish){
+  var p=CONFIG.projects.color;var wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-direction:column;align-items:center;padding:20px;width:100%';
+  var info=document.createElement('div');info.className='mt';info.style.fontSize='16px';info.style.marginBottom='8px';info.textContent='点击开始 · 限时 '+p.timeLimitSec+' 秒';
+  var timerEl=document.createElement('div');timerEl.style.cssText='font-size:28px;font-weight:800;color:#00ffff;margin-bottom:16px;line-height:1';timerEl.textContent='—';
+  var grid=document.createElement('div');grid.className='color-grid';
+  var btn=document.createElement('button');btn.className='btn btn-primary';btn.style.cssText='flex:none;padding:12px 30px;margin-top:20px';btn.textContent='开始';
+  wrap.appendChild(info);wrap.appendChild(timerEl);wrap.appendChild(grid);wrap.appendChild(btn);area.appendChild(wrap);
+  var state={currentLevel:1,maxLevel:0,timeLeft:p.timeLimitSec,phase:'intro',timer:null};
+  function nextLevel(){
+    var size=Math.min(3+Math.floor(state.currentLevel/2),7);var diff=Math.max(4,55-state.currentLevel*3);
+    var bh=Math.random()*360,bl=45+Math.random()*10,tid=Math.floor(Math.random()*size*size);
+    grid.innerHTML='';
+    var cs=44;
+    if(window.innerWidth<700){cs=Math.min(46,Math.floor((window.innerWidth-60)/size));}
+    grid.style.gridTemplateColumns='repeat('+size+','+cs+'px)';
+    for(var i=0;i<size*size;i++){
+      var c=document.createElement('div');c.className='color-cell';c.style.width=cs+'px';c.style.height=cs+'px';
+      if(i===tid){c.style.background='hsl('+bh+',72%,'+(bl+diff)+'%)';c.dataset.t='1';}else c.style.background='hsl('+bh+',72%,'+bl+'%)';
+      c.addEventListener('click',function(){
+        if(state.phase!=='run')return;
+        if(this.dataset.t==='1'){
+          state.currentLevel++;if(state.currentLevel-1>state.maxLevel)state.maxLevel=state.currentLevel-1;
+          if(state.currentLevel>p.maxLevel){endRound(true);return;}
+          info.textContent='正确！第 '+state.currentLevel+' 关';nextLevel();
+        }else{
+          var self=this;self.style.outline='3px solid #ff5252';setTimeout(function(){self.style.outline='';},200);
+          state.timeLeft=Math.max(0,state.timeLeft-p.wrongPenaltySec);timerEl.textContent=state.timeLeft.toFixed(1)+' 秒';
+          info.textContent='点错了，再试第 '+state.currentLevel+' 关';
+          if(state.timeLeft<=0)endRound(false);
+        }
+      });
+      grid.appendChild(c);
+    }
+    info.textContent='第 '+state.currentLevel+' 关 · '+size+'×'+size;
+  }
+  function endRound(rm){
+    if(state.phase==='done')return;state.phase='done';if(state.timer)clearInterval(state.timer);
+    var r=state.maxLevel;var s=Math.round(r*100/p.maxLevel);s=Math.max(0,Math.min(100,s));if(rm)s=100;
+    info.textContent='完成！到达第 '+r+' 关';timerEl.textContent='—';grid.innerHTML='';
+    setTimeout(function(){finish(s,{level:r});},1200);
+  }
+  btn.addEventListener('click',function(){
+    if(state.phase!=='intro')return;state.phase='run';btn.style.display='none';
+    state.currentLevel=p.startLevel;state.maxLevel=0;state.timeLeft=p.timeLimitSec;
+    timerEl.textContent=state.timeLeft.toFixed(1)+' 秒';nextLevel();
+    state.timer=setInterval(function(){
+      if(state.phase!=='run')return;state.timeLeft-=0.1;
+      if(state.timeLeft<=0){state.timeLeft=0;timerEl.textContent='0.0 秒';endRound(false);return;}
+      timerEl.textContent=state.timeLeft.toFixed(1)+' 秒';
+    },100);
+  });
+  currentCleanup=function(){if(state.timer)clearInterval(state.timer);};
+}};
+
+TESTS.typing={start:function(area,finish){
+  var p=CONFIG.projects.typing;
+  var sample=TYPING_SAMPLES[Math.floor(Math.random()*TYPING_SAMPLES.length)];
+  var wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-direction:column;align-items:center;padding:20px;width:100%';
+  var info=document.createElement('div');info.style.cssText='font-size:14px;color:#888;margin-bottom:16px';info.textContent='剩余 '+p.durationSec+' 秒 · 请开始输入';
+  var td=document.createElement('div');td.className='typing-text';
+  var input=document.createElement('input');input.className='typing-input';input.type='text';input.autocomplete='off';input.spellcheck=false;input.style.display='none';
+  var btn=document.createElement('button');btn.className='btn btn-primary';btn.style.cssText='flex:none;padding:12px 30px';btn.textContent='开始';
+  wrap.appendChild(info);wrap.appendChild(td);wrap.appendChild(input);wrap.appendChild(btn);area.appendChild(wrap);
+  var startTime=null,timer=null,inputText='',done=false;
+  function render(t){var h='';for(var i=0;i<sample.length;i++){var ch=sample[i],ce=escapeHtml(ch);
+    if(i<t.length){if(t[i]===ch)h+='<span class="ok">'+ce+'</span>';else h+='<span class="bad">'+ce+'</span>';}
+    else if(i===t.length)h+='<span class="cur">'+ce+'</span>';else h+=ce;}td.innerHTML=h;}
+  render('');
+  function fr(){
+    if(done)return;done=true;if(timer)clearInterval(timer);input.disabled=true;
+    var el=(performance.now()-startTime)/1000,c=0;
+    for(var i=0;i<inputText.length;i++)if(inputText[i]===sample[i])c++;
+    var wpm=(inputText.length/5)/(el/60),acc=inputText.length>0?c/inputText.length:0,s=0;
+    if(inputText.length>0){var ss=Math.max(0,Math.min(100,(wpm/p.baseWPM)*50)),as=acc*100*0.5;s=Math.round(ss+as);s=Math.max(0,Math.min(100,s));}
+    info.textContent='完成 · WPM '+wpm.toFixed(1)+' · 准确率 '+(acc*100).toFixed(1)+'%';
+    setTimeout(function(){finish(s,{wpm:Math.round(wpm),accuracy:Math.round(acc*100),typed:inputText.length});},1200);
+  }
+  btn.addEventListener('click',function(){
+    btn.style.display='none';input.style.display='block';input.focus();startTime=performance.now();
+    var r=p.durationSec;timer=setInterval(function(){r--;info.textContent='剩余 '+r+' 秒';if(r<=0)fr();},1000);
+  });
+  input.addEventListener('input',function(){inputText=input.value;render(inputText);if(inputText.length>=sample.length)fr();});
+  currentCleanup=function(){if(timer)clearInterval(timer);};
+}};
+
+/* 追踪精度：随机正弦合成轨迹 */
+TESTS.chase={start:function(area,finish){
+  var p=CONFIG.projects.chase;var wrap=document.createElement('div');wrap.style.width='100%';
+  var info=document.createElement('div');info.style.cssText='font-size:13px;color:#888;text-align:center;padding:12px';info.textContent='点击开始 · 鼠标跟随目标 · '+p.durationSec+' 秒';
+  var arena=document.createElement('div');arena.className='chase-area';
+  var target=document.createElement('div');target.className='chase-target';target.style.width=p.targetSize+'px';target.style.height=p.targetSize+'px';target.style.display='none';
+  var cursor=document.createElement('div');cursor.className='chase-cursor';cursor.style.display='none';
+  arena.appendChild(target);arena.appendChild(cursor);wrap.appendChild(info);wrap.appendChild(arena);area.appendChild(wrap);
+  var state={phase:'intro',mouseX:0,mouseY:0,inT:0,tt:0,raf:null,timer:null,lastTs:0,startTs:0,
+    freqX1:0,freqX2:0,freqY1:0,freqY2:0,phaseX1:0,phaseX2:0,phaseY1:0,phaseY2:0,ampX1:0,ampX2:0,ampY1:0,ampY2:0,speedScale:1};
+
+  function initRandomPath(){
+    var sp=p.speed;
+    state.speedScale=Math.max(0.6,Math.min(2.5,sp/1.5));
+    state.freqX1=0.15+Math.random()*0.15;
+    state.freqX2=0.45+Math.random()*0.35;
+    state.freqY1=0.15+Math.random()*0.15;
+    state.freqY2=0.45+Math.random()*0.35;
+    state.phaseX1=Math.random()*Math.PI*2;
+    state.phaseX2=Math.random()*Math.PI*2;
+    state.phaseY1=Math.random()*Math.PI*2;
+    state.phaseY2=Math.random()*Math.PI*2;
+    state.ampX1=0.55+Math.random()*0.25;
+    state.ampX2=0.20+Math.random()*0.20;
+    state.ampY1=0.55+Math.random()*0.25;
+    state.ampY2=0.20+Math.random()*0.20;
+  }
+
+  function step(){
+    if(state.phase!=='run')return;
+    var sz=p.targetSize;
+    var w=arena.clientWidth-sz;
+    var h=arena.clientHeight-sz;
+    var cx=w/2,cy=h/2;
+    var now=performance.now();
+    var t=(now-state.startTs)/1000*state.speedScale;
+    var nx=Math.sin(t*state.freqX1*Math.PI*2+state.phaseX1)*state.ampX1
+          +Math.sin(t*state.freqX2*Math.PI*2+state.phaseX2)*state.ampX2;
+    var ny=Math.sin(t*state.freqY1*Math.PI*2+state.phaseY1)*state.ampY1
+          +Math.sin(t*state.freqY2*Math.PI*2+state.phaseY2)*state.ampY2;
+    if(nx>1)nx=1;if(nx<-1)nx=-1;
+    if(ny>1)ny=1;if(ny<-1)ny=-1;
+    var x=cx+nx*(w/2);
+    var y=cy+ny*(h/2);
+    target.style.left=x+'px';target.style.top=y+'px';
+    var tcx=x+sz/2,tcy=y+sz/2;
+    var dx=state.mouseX-tcx,dy=state.mouseY-tcy;
+    var inTarget=Math.sqrt(dx*dx+dy*dy)<sz/2;
+    var dt=now-state.lastTs;
+    state.tt+=dt;
+    if(inTarget)state.inT+=dt;
+    state.lastTs=now;
+    state.raf=requestAnimationFrame(step);
+  }
+  arena.addEventListener('pointermove',function(e){var r=arena.getBoundingClientRect();state.mouseX=e.clientX-r.left;state.mouseY=e.clientY-r.top;cursor.style.left=state.mouseX+'px';cursor.style.top=state.mouseY+'px';});
+  arena.addEventListener('pointerdown',function(e){
+    if(state.phase!=='intro')return;if(e.pointerType==='mouse'&&e.button!==0)return;
+    state.phase='run';target.style.display='block';cursor.style.display='block';
+    var r=arena.getBoundingClientRect();state.mouseX=e.clientX-r.left;state.mouseY=e.clientY-r.top;
+    initRandomPath();
+    state.startTs=performance.now();
+    state.lastTs=state.startTs;
+    state.inT=0;state.tt=0;
+    info.textContent='追踪中...';
+    state.raf=requestAnimationFrame(step);
+    state.timer=setTimeout(function(){
+      state.phase='done';cancelAnimationFrame(state.raf);
+      var pct=state.tt>0?state.inT/state.tt*100:0;var s=Math.round(pct);
+      info.textContent='完成 · 命中率 '+pct.toFixed(1)+'%';
+      setTimeout(function(){finish(s,{hitPercent:Math.round(pct)});},1000);
+    },p.durationSec*1000);
+  });
+  currentCleanup=function(){if(state.raf)cancelAnimationFrame(state.raf);if(state.timer)clearTimeout(state.timer);};
+}};
+
+TESTS.sound={start:function(area,finish){
+  var p=CONFIG.projects.sound;var state={mode:'idle',times:[],timer:null,startT:null,audioCtx:null};
+  var panel=makeTestPanel('','点击开始','共 '+p.trials+' 次');area.appendChild(panel);
+  function ensureAudio(){if(!state.audioCtx){try{state.audioCtx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}if(state.audioCtx&&state.audioCtx.state==='suspended')state.audioCtx.resume();}
+  function beep(){if(!state.audioCtx)return;var o=state.audioCtx.createOscillator(),g=state.audioCtx.createGain();o.type='sine';o.frequency.value=880;g.gain.value=0.15;o.connect(g);g.connect(state.audioCtx.destination);o.start();o.stop(state.audioCtx.currentTime+0.12);}
+  function next(){state.mode='waiting';panel.className='test-panel w';panel.querySelector('.mt').textContent='等待提示音';panel.querySelector('.st').textContent='听到"嘀"声后立即点击';
+    state.timer=setTimeout(function(){state.mode='ready';beep();panel.className='test-panel r';panel.querySelector('.mt').textContent='点击';panel.querySelector('.st').textContent='';state.startT=performance.now();},p.delayMin+Math.random()*(p.delayMax-p.delayMin));}
+  function handler(e){
+    if(e.pointerType==='mouse'&&e.button!==0)return;ensureAudio();
+    if(state.mode==='idle'){next();return;}
+    if(state.mode==='waiting'){clearTimeout(state.timer);state.mode='idle';panel.className='test-panel e';panel.querySelector('.mt').textContent='过早点击';panel.querySelector('.st').textContent='点击重试';return;}
+    if(state.mode==='ready'){
+      var t=Math.round(performance.now()-state.startT);state.times.push(t);
+      if(state.times.length>=p.trials){
+        var avg=state.times.reduce(function(a,b){return a+b;},0)/state.times.length;
+        var score=Math.max(0,Math.min(100,100-(avg-p.speedBase)*p.speedFactor));
+        state.mode='done';panel.className='test-panel s';panel.querySelector('.mt').textContent='完成';panel.querySelector('.st').textContent='平均 '+Math.round(avg)+'ms';
+        setTimeout(function(){finish(Math.round(score),{times:state.times,avg:Math.round(avg)});},900);return;
+      }
+      state.mode='idle';panel.className='test-panel s';panel.querySelector('.mt').textContent=t+'ms';panel.querySelector('.st').textContent='('+state.times.length+'/'+p.trials+')';
+      setTimeout(next,700);
+    }
+  }
+  panel.addEventListener('pointerdown',handler);
+  currentCleanup=function(){clearTimeout(state.timer);panel.removeEventListener('pointerdown',handler);if(state.audioCtx){try{state.audioCtx.close();}catch(e){}}};
+}};
+
+function showGridView(){gridView.style.display='block';testView.style.display='none';renderGrid();}
+function showTestView(key){
+  gridView.style.display='none';testView.style.display='block';currentTest=key;
+  var p=CONFIG.projects[key];
+  testName.textContent=p.name;testInfo.textContent='权重 '+p.weight;
+  testBody.innerHTML='';testFootInfo.textContent='';
+  if(currentCleanup){try{currentCleanup();}catch(e){}currentCleanup=null;}
+  var def=TESTS[key];
+  if(!def){testBody.innerHTML='<div class="test-panel i"><div class="mt">项目不可用</div></div>';return;}
+  def.start(testBody,function(score,data){recordProjectResult(key,score,data||{});showGridView();});
+}
+function renderGrid(){
+  var s=purgeExpiredSession();var en=getEnabledProjects();var html='';
+  en.forEach(function(k){
+    var p=CONFIG.projects[k];var e=s[k];var done=e&&!isExpired(e);var exp=e&&isExpired(e);
+    var cls='card';if(done)cls+=' done';else if(exp)cls+=' expired';
+    var sc='<div class="card-score" style="color:#333">—<span class="u">分</span></div>';
+    var tg='<span class="card-tag">未测</span>';
+    if(done){var clr=gradeColor(getGrade(e.score));sc='<div class="card-score" style="color:'+clr+'">'+e.score+'<span class="u">分</span></div>';tg='<span class="card-tag done">有效 '+remainingMinutes(e)+'分钟</span>';}
+    else if(exp){sc='<div class="card-score" style="color:#552222">'+e.score+'<span class="u">分</span></div>';tg='<span class="card-tag expired">已过期</span>';}
+    html+='<div class="'+cls+'" data-key="'+k+'"><div class="card-name">'+escapeHtml(p.name)+'</div>'+(CONFIG.showCardDesc?'<div class="card-desc">'+escapeHtml(p.desc)+'</div>':'')+sc+'<div class="card-foot"><span>权重 '+p.weight+'</span>'+tg+'</div></div>';
+  });
+  projectGrid.innerHTML=html;
+  var cards=projectGrid.querySelectorAll('.card');
+  for(var i=0;i<cards.length;i++){(function(el){el.addEventListener('click',function(){showTestView(el.getAttribute('data-key'));});})(cards[i]);}
+  var r=computeTotal();var sh='';
+  if(r.ready){
+    if(IS_MOBILE){
+      sh='<div><div style="font-size:11px;color:#666;margin-bottom:6px">综合成绩</div><div class="summary-total">'+r.total+'<span class="u">分</span></div></div>'+
+        '<div class="summary-info">已完成 <b>'+r.tested+'</b> / '+r.totalCount+' 项<br>等级 <span style="color:'+gradeColor(r.grade)+';font-weight:800;font-size:16px">'+r.grade+'</span></div>'+
+        '<div class="summary-locked" style="color:#ff9f43;border-color:#3a2a10;background:#1a1408">📱 手机端暂不支持提交，请用电脑登录同一账号上传成绩</div>'+
+        '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="btnResetSession" type="button" style="flex:none;padding:12px 20px">清空本次</button></div>';
+    }else{
+      sh='<div><div style="font-size:11px;color:#666;margin-bottom:6px">综合成绩</div><div class="summary-total">'+r.total+'<span class="u">分</span></div></div>'+
+        '<div class="summary-info">已完成 <b>'+r.tested+'</b> / '+r.totalCount+' 项<br>等级 <span style="color:'+gradeColor(r.grade)+';font-weight:800;font-size:16px">'+r.grade+'</span></div>'+
+        '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary" id="btnSaveTotal" type="button" style="flex:none;padding:12px 20px">上传到云端</button><button class="btn" id="btnResetSession" type="button" style="flex:none;padding:12px 20px">清空本次</button></div>';
+    }
+  }else{
+    sh='<div><div style="font-size:11px;color:#666;margin-bottom:6px">综合成绩</div><div class="summary-total" style="color:#333">—<span class="u" style="color:#333">分</span></div></div>'+
+      '<div class="summary-info">已完成 <b>'+r.tested+'</b> / '+r.totalCount+' 项<br>需完成 <b style="color:#ff9f43">'+r.required+'</b> 项才能生成综合成绩</div>'+
+      (IS_MOBILE?'<div class="summary-locked">📱 手机端暂不支持提交，请在电脑上完成测试并上传</div>':'<div class="summary-locked">还需完成 '+r.need+' 项 · 暂不可上传</div>')+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+        (IS_MOBILE?'':'<button class="btn" type="button" disabled style="flex:none;padding:12px 20px">上传到云端</button>')+
+        '<button class="btn" id="btnResetSession" type="button" style="flex:none;padding:12px 20px">清空本次</button>'+
+      '</div>';
+  }
+  summaryBox.innerHTML=sh;
+  var b=document.getElementById('btnSaveTotal');if(b)b.addEventListener('click',function(){openSaveDialog();});
+  document.getElementById('btnResetSession').addEventListener('click',function(){if(!confirm('清空本次所有单项成绩？'))return;saveSession({});renderGrid();});
+  gridSub.textContent='已完成 '+r.tested+' / '+r.totalCount+' 项';
+}
+function openSaveDialog(){
+  if(IS_MOBILE){alert('手机端暂不支持提交成绩。\n\n请在电脑浏览器打开同一网址，用「'+currentUser.name+' + 你的密码」登录，然后上传成绩。\n\n手机上测的成绩已保存在本地浏览器，但手机和电脑的数据不互通，需要重新测或直接在电脑上测。');return;}
+  var r=computeTotal();if(!r.ready){alert('需完成 '+r.required+' 个项目才能保存。');return;}
+  modalOverlay.style.display='flex';
+  modalBox.innerHTML='<div class="modal-title"><span>上传成绩</span><span class="modal-sub">'+r.tested+'/'+r.totalCount+' 项</span></div>'+
+    '<div class="modal-hint" style="margin-bottom:12px">本次成绩将保存到你的账号：<b style="color:'+(currentUser.isAdmin?'#c084fc':'#00ffff')+'">'+escapeHtml(currentUser.name)+' #'+escapeHtml(currentUser.id)+'</b></div>'+
+    '<div class="modal-field"><label>备注（可选）</label><input type="text" id="saveNote" maxlength="80"></div>'+
+    '<div class="modal-actions"><button class="btn btn-primary" id="btnSaveConfirm" type="button">上传</button><button class="btn" id="btnSaveCancel" type="button">取消</button></div>';
+  document.getElementById('btnSaveConfirm').addEventListener('click',function(){
+    var entry={id:Date.now()+'_'+Math.random().toString(36).slice(2,8),name:currentUser.name,
+      userId:currentUser.id,isAdmin:!!currentUser.isAdmin,
+      score:r.total,rank:r.grade,projects:r.items.map(function(it){return{key:it.key,score:it.score,weight:it.weight};}),
+      note:document.getElementById('saveNote').value.trim(),ts:Date.now()};
+    addToLeaderboard(entry).then(function(ok){
+      if(ok){modalOverlay.style.display='none';leaderboardOpen=true;applyLeaderboardOpenState();showToast('上传成功');}
+    });
+  });
+  document.getElementById('btnSaveCancel').addEventListener('click',function(){modalOverlay.style.display='none';});
+}
+btnQuit.addEventListener('click',function(){if(currentCleanup){try{currentCleanup();}catch(e){}currentCleanup=null;}showGridView();});
+
+brandEl.addEventListener('click',function(){brandClickCount++;clearTimeout(brandClickTimer);brandClickTimer=setTimeout(function(){brandClickCount=0;},1500);if(brandClickCount>=5){brandClickCount=0;openBackdoor();}});
+document.addEventListener('keydown',function(e){var tag=e.target&&e.target.tagName;if(tag==='INPUT'||tag==='TEXTAREA')return;if(e.ctrlKey&&e.shiftKey&&(e.key==='9'||e.code==='Digit9')){e.preventDefault();openBackdoor();return;}});
+function openBackdoor(){if(!currentUser){showToast('请先登录');return;}if(!currentUser.isAdmin){showToast('权限不足：仅管理员可访问后台');return;}modalOverlay.style.display='flex';renderAdminPanel('config');}
+function closeModal(){modalOverlay.style.display='none';modalBox.innerHTML='';}
+function renderAdminPanel(tab){
+  if(!currentUser||!currentUser.isAdmin){closeModal();return;}
+  var th='';
+  th+='<button class="tab-btn'+(tab==='config'?' active':'')+'" data-tab="config" type="button">基础配置</button>';
+  th+='<button class="tab-btn'+(tab==='leaderboard'?' active':'')+'" data-tab="leaderboard" type="button">排行榜管理</button>';
+  th+='<button class="tab-btn'+(tab==='users'?' active':'')+'" data-tab="users" type="button">用户管理</button>';
+  th+='<button class="tab-btn'+(tab==='grade'?' active':'')+'" data-tab="grade" type="button">等级定义</button>';
+  for(var k in PROJECT_SCHEMA){var p=CONFIG.projects[k];th+='<button class="tab-btn'+(tab==='proj_'+k?' active':'')+'" data-tab="proj_'+k+'" type="button">'+escapeHtml(p.name)+'</button>';}
+  modalBox.innerHTML='<div class="modal-title"><span>★ 管理后台</span><span class="modal-sub">'+escapeHtml(currentUser.name)+' · #'+escapeHtml(currentUser.id)+'</span></div><div class="admin-tabs">'+th+'</div><div id="tabContent"></div>';
+  var btns=modalBox.querySelectorAll('.tab-btn');
+  for(var i=0;i<btns.length;i++){(function(b){b.addEventListener('click',function(){renderAdminPanel(b.getAttribute('data-tab'));});})(btns[i]);}
+  if(tab==='config')renderConfigTab();
+  else if(tab==='leaderboard')renderLeaderboardTab();
+  else if(tab==='users')renderUsersTab();
+  else if(tab==='grade')renderGradeTab();
+  else if(tab.indexOf('proj_')===0)renderProjectTab(tab.substring(5));
+}
+function renderField(f,v){var full=f.full?' full':'';var h='<div class="modal-field'+full+'"><label>'+escapeHtml(f.label)+'</label>';if(f.type==='textarea')h+='<textarea id="cfg_'+f.key+'" spellcheck="false">'+escapeHtml(v)+'</textarea>';else if(f.type==='number'){var st=f.step!==undefined?f.step:1,mn=f.min!==undefined?' min="'+f.min+'"':'',mx=f.max!==undefined?' max="'+f.max+'"':'';h+='<input type="number" id="cfg_'+f.key+'" value="'+escapeHtml(v)+'" step="'+st+'"'+mn+mx+'>';}else h+='<input type="text" id="cfg_'+f.key+'" value="'+escapeHtml(v)+'" spellcheck="false">';if(f.hint)h+='<div class="modal-hint">'+escapeHtml(f.hint)+'</div>';h+='</div>';return h;}
+function renderConfigTab(){
+  var slot=document.getElementById('tabContent');var h='',go=false;
+  CONFIG_SCHEMA.forEach(function(f){if(f.section){if(go){h+='</div>';go=false;}h+='<div class="modal-section-title">'+escapeHtml(f.section)+'</div>';return;}if(!go){h+='<div class="modal-grid">';go=true;}h+=renderField(f,CONFIG[f.key]);});
+  if(go)h+='</div>';
+  h+='<div class="modal-actions"><button class="btn btn-primary" id="btnCfgSave" type="button">保存并重载</button><button class="btn" id="btnCfgClose" type="button">关闭</button></div>';
+  slot.innerHTML=h;
+  document.getElementById('btnCfgSave').addEventListener('click',function(){var next=Object.assign({},CONFIG);CONFIG_SCHEMA.forEach(function(f){if(f.section)return;var el=document.getElementById('cfg_'+f.key);if(!el)return;var v=el.value;if(f.type==='number'){var n=parseFloat(v);if(isNaN(n))return;if(f.min!==undefined)n=Math.max(f.min,n);if(f.max!==undefined)n=Math.min(f.max,n);next[f.key]=n;}else next[f.key]=v;});CONFIG=next;saveConfig();location.reload();});
+  document.getElementById('btnCfgClose').addEventListener('click',closeModal);
+}
+function renderGradeTab(){var slot=document.getElementById('tabContent');slot.innerHTML='<div class="modal-section-title">等级定义</div><div class="modal-field full"><label>每行：等级 最低分（从高到低）</label><textarea id="cfg_gradeLines" spellcheck="false" style="min-height:260px">'+escapeHtml(CONFIG.gradeLines)+'</textarea></div><div class="modal-actions"><button class="btn btn-primary" id="btnGradeSave" type="button">保存并重载</button><button class="btn" id="btnGradeClose" type="button">关闭</button></div>';document.getElementById('btnGradeSave').addEventListener('click',function(){CONFIG.gradeLines=document.getElementById('cfg_gradeLines').value;saveConfig();location.reload();});document.getElementById('btnGradeClose').addEventListener('click',closeModal);}
+function renderProjectTab(key){var slot=document.getElementById('tabContent');var schema=PROJECT_SCHEMA[key],proj=CONFIG.projects[key];if(!schema){slot.innerHTML='<div class="lb-empty">未知项目</div>';return;}var h='<div class="modal-section-title">'+escapeHtml(proj.name)+' 参数</div>';var go=false;schema.forEach(function(f){if(!go){h+='<div class="modal-grid">';go=true;}h+=renderField(f,proj[f.key]);});if(go)h+='</div>';h+='<div class="modal-actions"><button class="btn btn-primary" id="btnProjSave" type="button">保存</button><button class="btn" id="btnProjClose" type="button">关闭</button></div>';slot.innerHTML=h;document.getElementById('btnProjSave').addEventListener('click',function(){var next=JSON.parse(JSON.stringify(CONFIG.projects));schema.forEach(function(f){var el=document.getElementById('cfg_'+f.key);if(!el)return;var v=el.value;if(f.type==='number'){var n=parseFloat(v);if(isNaN(n))return;if(f.min!==undefined)n=Math.max(f.min,n);if(f.max!==undefined)n=Math.min(f.max,n);next[key][f.key]=n;}else next[key][f.key]=v;});CONFIG.projects=next;saveConfig();location.reload();});document.getElementById('btnProjClose').addEventListener('click',closeModal);}
+function renderLeaderboardTab(){
+  var slot=document.getElementById('tabContent');var list=cloudLeaderboardCache||[];
+  var h='<div class="lb-toolbar"><button class="btn btn-sm" id="btnCloudReload" type="button">刷新</button></div>';
+  h+='<div class="modal-hint" style="margin-bottom:12px">共 '+list.length+' 条记录</div>';
+  if(list.length===0)h+='<div class="lb-empty">暂无记录</div>';
+  else{
+    h+='<div class="lb-admin-header"><div>序号</div><div>姓名</div><div style="text-align:right">总分</div><div>用户ID</div><div style="text-align:center">等级</div><div class="h-ts" style="text-align:right">时间戳</div><div style="text-align:right">操作</div></div>';
+    list.forEach(function(item,idx){var c=gradeColor(item.rank);var star=item.is_admin?'<span class="star">★</span> ':'';h+='<div class="lb-admin-row'+(item.is_admin?' is-admin':'')+'"><div class="cell">#'+(idx+1)+'</div><div class="cell name">'+star+escapeHtml(item.name)+'</div><div class="cell num">'+item.score+'</div><div class="cell uid">'+escapeHtml(item.user_id||'—')+'</div><div class="cell rank" style="color:'+c+'">'+escapeHtml(item.rank)+'</div><div class="cell ts">'+formatTs(item.ts)+'</div><div class="cell actions"><button class="btn btn-sm btn-danger" data-del-cloud="'+item.id+'">删除</button></div></div>';});
+  }
+  h+='<div class="modal-actions"><button class="btn" id="btnLbClose" type="button">关闭</button></div>';
+  slot.innerHTML=h;
+  document.getElementById('btnCloudReload').addEventListener('click',async function(){await fetchCloudLeaderboard();renderLeaderboardTab();});
+  document.getElementById('btnLbClose').addEventListener('click',closeModal);
+  slot.querySelectorAll('[data-del-cloud]').forEach(function(b){b.addEventListener('click',async function(){var id=this.getAttribute('data-del-cloud');if(!confirm('删除这条记录？'))return;var res=await supabase.from('leaderboard').delete().eq('id',id);if(res.error){alert(res.error.message);return;}cloudLeaderboardCache=cloudLeaderboardCache.filter(function(x){return x.id!==id;});renderLeaderboardTab();refreshLeaderboardDisplay();});});
+}
+async function renderUsersTab(){
+  var slot=document.getElementById('tabContent');
+  slot.innerHTML='<div class="lb-empty">加载中...</div>';
+  var res=await supabase.from('users').select('*').order('created_ts',{ascending:false}).limit(500);
+  if(res.error){slot.innerHTML='<div class="lb-empty">读取失败：'+escapeHtml(res.error.message)+'</div>';return;}
+  var list=res.data||[];
+  var h='<div class="modal-hint" style="margin-bottom:12px">共 '+list.length+' 位用户（含管理员）</div>';
+  if(list.length===0)h+='<div class="lb-empty">暂无用户</div>';
+  else{
+    h+='<div class="lb-admin-header" style="grid-template-columns:1fr 140px 60px 180px 100px"><div>名字</div><div>ID</div><div style="text-align:center">身份</div><div style="text-align:right">注册时间</div><div style="text-align:right">操作</div></div>';
+    list.forEach(function(u){
+      h+='<div class="lb-admin-row'+(u.is_admin?' is-admin':'')+'" style="grid-template-columns:1fr 140px 60px 180px 100px">'+
+        '<div class="cell name">'+(u.is_admin?'<span class="star">★</span> ':'')+escapeHtml(u.name)+'</div>'+
+        '<div class="cell uid">'+escapeHtml(u.id)+'</div>'+
+        '<div class="cell" style="text-align:center;color:'+(u.is_admin?'#c084fc':'#666')+'">'+(u.is_admin?'管理员':'普通')+'</div>'+
+        '<div class="cell ts">'+formatTs(u.created_ts)+'</div>'+
+        '<div class="cell actions"><button class="btn btn-sm btn-danger" data-del-user="'+escapeHtml(u.id)+'" '+(u.id===DEFAULT_ADMIN_ID?'disabled':'')+'>删除</button></div>'+
+      '</div>';
+    });
+  }
+  h+='<div class="modal-actions"><button class="btn" id="btnUsersClose" type="button">关闭</button></div>';
+  slot.innerHTML=h;
+  document.getElementById('btnUsersClose').addEventListener('click',closeModal);
+  slot.querySelectorAll('[data-del-user]').forEach(function(b){b.addEventListener('click',async function(){var id=this.getAttribute('data-del-user');if(!confirm('删除该用户？该用户的成绩不会自动删除。'))return;var r=await supabase.from('users').delete().eq('id',id);if(r.error){alert(r.error.message);return;}renderUsersTab();});});
+}
+modalOverlay.addEventListener('click',function(e){if(e.target===modalOverlay)closeModal();});
+
+function initUI(){
+  brandEl.innerHTML=renderBrand(CONFIG.brandName);brandMeta.textContent=CONFIG.brandMeta;document.title=CONFIG.brandName+' · 综合反应测试';
+  GRADES=parseGrades(CONFIG.gradeLines);
+  loginBrand.innerHTML=renderBrand(CONFIG.brandName);
+  var u=loadCurrentUser();if(u&&u.name){currentUser=u;enterMain();}else renderLogin();
+}
+initUI();
+</script>
+</body>
+</html>
