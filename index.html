@@ -136,7 +136,9 @@ body{font-family:"JetBrains Mono","SF Mono",Consolas,"Courier New",monospace;bac
 .lb-group.rank-3 .lb-rank{color:#cd7f32}
 .lb-group.is-admin .lb-rank{color:#c084fc}
 .lb-group:not(.rank-1):not(.rank-2):not(.rank-3):not(.is-admin) .lb-rank{color:#555;font-size:12px;font-weight:700}
-.lb-name{color:#e8e8e8;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px;display:flex;align-items:center;gap:6px}
+.lb-name{color:#e8e8e8;font-weight:600;padding-right:8px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;min-width:0;overflow:hidden}
+.lb-name-row{display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;max-width:100%}
+.lb-gear{font-size:10px;color:#555;font-weight:400;font-family:'Microsoft YaHei','PingFang SC','Noto Sans SC',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;line-height:1.3}
 .lb-group.is-admin .lb-name{color:#e9d5ff}
 .lb-name .star{color:#a855f7;font-size:13px}
 .lb-name .uid{font-size:10px;color:#555;font-weight:400}
@@ -580,6 +582,7 @@ var currentUser=null,currentTest=null,currentCleanup=null;
 var leaderboardOpen=!!CONFIG.leaderboardDefaultOpen;
 var brandClickCount=0,brandClickTimer=null,lastSavedId=null;
 var cloudLeaderboardCache=[];
+var userGearCache={};
 var expandedGroups={};
 
 userLoginName.addEventListener('input',function(){this.value=normalizeName(this.value);});
@@ -764,6 +767,16 @@ async function fetchCloudLeaderboard(){
     var res=await supabase.from('leaderboard').select('*').order('score',{ascending:false}).limit(CONFIG.maxLeaderboard);
     if(res.error){leaderboardBody.innerHTML='<div class="lb-empty">读取失败：'+escapeHtml(res.error.message)+'</div>';return;}
     cloudLeaderboardCache=res.data||[];
+    try{
+      var ures=await supabase.from('users').select('id,gear');
+      if(ures.data){
+        userGearCache={};
+        for(var gi=0;gi<ures.data.length;gi++){
+          var gu=ures.data[gi];
+          if(gu.gear&&gu.gear.trim())userGearCache[gu.id]=gu.gear.trim();
+        }
+      }
+    }catch(e){}
     refreshLeaderboardDisplay();
   }catch(e){leaderboardBody.innerHTML='<div class="lb-empty">网络异常：'+escapeHtml(String(e.message||e))+'</div>';}
 }
@@ -811,9 +824,14 @@ function renderLeaderboardHtml(groups,hid){
     var cntHtml=cnt>1?'<span class="cnt">'+cnt+'次</span>':'';
     var arrow=cnt>1?'<span class="toggle-arrow">▾</span>':'';
     var expanded=!!expandedGroups[g.userId];
+        var gear=userGearCache[g.userId]||'';
+    var gearHtml=gear?'<div class="lb-gear">'+escapeHtml(gear)+'</div>':'';
     var row='<div class="lb-row" data-uid="'+escapeHtml(g.userId)+'">'+
       '<div class="lb-rank">#'+(index+1)+'</div>'+
-      '<div class="lb-name">'+star+escapeHtml(g.name)+uid+cntHtml+arrow+'</div>'+
+      '<div class="lb-name">'+
+        '<div class="lb-name-row">'+star+escapeHtml(g.name)+uid+cntHtml+arrow+'</div>'+
+        gearHtml+
+      '</div>'+
       '<div class="lb-score">'+g.best.score+'</div>'+
       '<div class="lb-grade" style="color:'+c+'">'+escapeHtml(g.best.rank)+'</div>'+
       (showTs?'<div class="lb-ts">'+formatTs(g.best.ts)+'</div>':'<div class="lb-ts"></div>')+
