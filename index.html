@@ -650,6 +650,7 @@ button,input,textarea,select{font-family:inherit}
       <div class="brand" id="brandEl"></div>
       <div class="brand-right">
         <button class="theme-btn" id="btnChangelog" type="button" data-i18n="changelogBtn"></button>
+       <button class="theme-btn" id="btnFeedback" type="button" data-i18n="feedbackBtn"></button>
         <span class="user-chip" id="userChip" style="display:none"></span>
         <button class="skin-btn" id="skinBtnMain" type="button"><span id="skinBtnMainText">主题</span><span class="caret">▾</span></button>
         <button class="theme-btn" id="langBtnMain" type="button">CN</button>
@@ -802,8 +803,7 @@ var I18N={
     adminBadge:'以管理员身份登录',adminNameLabel:'管理员名字',adminNamePh:'例如: ADMIN',
     adminPwdLabel:'管理员密码',adminPwdPh:'请输入管理员密码',btnAdminLogin:'管理员登录',
     adminHint:'此入口仅供管理员使用<br>普通用户请使用左侧「普通用户」入口',
-   changelogBtn:'更新日志',changelogTitle:'更新日志',changelogEmpty:'暂无更新记录',changelogLoading:'加载中...', themeDark:'主题',themeLight:'主题',logout:'登出',
-    sectionTests:'测试项目',btnQuit:'退出测试',
+changelogBtn:'更新日志',changelogTitle:'更新日志',changelogEmpty:'暂无更新记录',changelogLoading:'加载中...',themeDark:'主题',themeLight:'主题',logout:'登出',feedbackBtn:'反馈',    sectionTests:'测试项目',btnQuit:'退出测试',
     unitPt:'分',unitItem:'项',unitMin:'分钟',
     tagUntested:'未测',tagValid:'有效',tagExpired:'已过期',weight:'权重',
     tagNew:'新增',tagReq:'必做',
@@ -830,10 +830,10 @@ var I18N={
     pfSave:'保存',pfCancel:'取消',pfEdit:'编辑资料',pfNotFound:'未找到该用户',
     pfRadar:'能力雷达',pfGrowth:'成长曲线',pfShare:'生成分享卡片',pfExport:'导出 CSV',
     confirmLogout:'确认登出',
-    msgNoAdminReg:'你没有注册管理员的资格',msgNameOnly:'请输入名字（仅英文字母）',
+    msgNoAdminReg:'无注册权限',msgNameOnly:'请输入名字（仅英文字母）',
     msgNameMin:'名字至少 2 个字母',msgSetPwd:'请设置你的密码',msgPwdMin:'密码至少 4 位',
-    msgNameTaken:'此名字已被管理员占用',msgAlreadyReg:'这个名字 + 密码已注册过，请直接点【登录】',
-    msgLoginFail:'名字或密码错误，或账号不存在（首次请点【注册】）',
+    msgNameTaken:'此名字已被管理员占用',msgAlreadyReg:'这个名字 + 密码已注册过，请直接登录',
+    msgLoginFail:'名字或密码错误，或账号不存在（首次请点注册）',
     msgAdminEntry:'这是管理员账号，请用管理员入口登录',
     msgAdminName:'请输入管理员名字',msgAdminPwd:'请输入管理员密码',
     msgAdminNotFound:'管理员不存在或密码错误',msgAdminPwdWrong:'管理员密码错误',
@@ -874,7 +874,7 @@ var I18N={
     adminBadge:'Administrator Login',adminNameLabel:'Admin name',adminNamePh:'e.g. ADMIN',
     adminPwdLabel:'Admin password',adminPwdPh:'Enter admin password',btnAdminLogin:'Admin Login',
     adminHint:'This entry is for administrators only.<br>Regular users please use the user entry.',
-    changelogBtn:'Changelog',changelogTitle:'Changelog',changelogEmpty:'No entries yet',changelogLoading:'Loading...',themeDark:'Theme',themeLight:'Theme',logout:'Logout',
+changelogBtn:'Changelog',changelogTitle:'Changelog',changelogEmpty:'No entries yet',changelogLoading:'Loading...',themeDark:'Theme',themeLight:'Theme',logout:'Logout',feedbackBtn:'Feedback',
     sectionTests:'Test Items',btnQuit:'Quit Test',
     unitPt:' pts',unitItem:'',unitMin:' min',
     tagUntested:'Untested',tagValid:'Valid',tagExpired:'Expired',weight:'Weight',
@@ -946,7 +946,7 @@ var I18N={
     adminBadge:'管理者ログイン',adminNameLabel:'管理者名',adminNamePh:'例: ADMIN',
     adminPwdLabel:'管理者パスワード',adminPwdPh:'管理者パスワードを入力',btnAdminLogin:'管理者ログイン',
     adminHint:'この入口は管理者専用です。<br>一般ユーザーはユーザー入口をご利用ください。',
-    changelogBtn:'更新履歴',changelogTitle:'更新履歴',changelogEmpty:'記録がありません',changelogLoading:'読み込み中...',themeDark:'テーマ',themeLight:'テーマ',logout:'ログアウト',
+  changelogBtn:'更新履歴',changelogTitle:'更新履歴',changelogEmpty:'記録がありません',changelogLoading:'読み込み中...',themeDark:'テーマ',themeLight:'テーマ',logout:'ログアウト',feedbackBtn:'フィードバック',
     sectionTests:'テスト項目',btnQuit:'テストを終了',
     unitPt:'点',unitItem:'項目',unitMin:'分',
     tagUntested:'未測定',tagValid:'有効',tagExpired:'期限切れ',weight:'重み',
@@ -1018,7 +1018,7 @@ var I18N={
     adminBadge:'관리자 로그인',adminNameLabel:'관리자 이름',adminNamePh:'예: ADMIN',
     adminPwdLabel:'관리자 비밀번호',adminPwdPh:'관리자 비밀번호를 입력하세요',btnAdminLogin:'관리자 로그인',
     adminHint:'이 입구는 관리자 전용입니다.<br>일반 사용자는 사용자 입구를 이용하세요.',
-    changelogBtn:'업데이트',changelogTitle:'업데이트 내역',changelogEmpty:'기록이 없습니다',changelogLoading:'불러오는 중...',themeDark:'테마',themeLight:'테마',logout:'로그아웃',
+changelogBtn:'업데이트',changelogTitle:'업데이트 내역',changelogEmpty:'기록이 없습니다',changelogLoading:'불러오는 중...',themeDark:'테마',themeLight:'테마',logout:'로그아웃',feedbackBtn:'피드백',
     sectionTests:'테스트 항목',btnQuit:'테스트 종료',
     unitPt:'점',unitItem:'개',unitMin:'분',
     tagUntested:'미측정',tagValid:'유효',tagExpired:'만료됨',weight:'가중치',
@@ -3175,6 +3175,30 @@ async function openChangelog(){
   body.outerHTML=h;
 }
 document.getElementById('btnChangelog').addEventListener('click',openChangelog);
+document.getElementById('btnFeedback').addEventListener('click',function(){
+  var user='junteahub'; 
+  var host='outlook.com'; 
+  var email=user+String.fromCharCode(64)+host; 
+
+  var version=(typeof CONFIG!=='undefined'&&CONFIG.brandMeta)?CONFIG.brandMeta:'—';
+  var userInfo=currentUser?(currentUser.name+' #'+currentUser.id):'未登录';
+  var ua=navigator.userAgent;
+
+  var subject='[Jun.Tea HUB] 用户反馈';
+  var body=
+    '请描述你遇到的问题或建议：\n'+
+    '\n'+
+    '\n'+
+    '\n'+
+    '———————————————\n'+
+    '版本：'+version+'\n'+
+    '用户：'+userInfo+'\n'+
+    '页面：'+location.href+'\n'+
+    '浏览器：'+ua;
+
+  var url='mailto:'+email+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+  window.location.href=url;
+});
 function openSelfProfile(){if(!currentUser){return;}openProfile(currentUser.id);}
 modalOverlay.addEventListener('click',function(e){if(e.target===modalOverlay)closeModal();});
 
