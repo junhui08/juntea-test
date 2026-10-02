@@ -9,6 +9,37 @@
 <title>Jun.Tea · 综合反应测试</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+.lb-like-btn{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:2px 8px;margin-left:6px;
+  border:1px solid var(--border-2);background:var(--panel);
+  color:var(--text-3);font-family:inherit;font-size:11px;
+  cursor:pointer;border-radius:999px;line-height:1.5;
+  transition:all .15s;flex:none;
+}
+.lb-like-btn:hover{color:var(--bad);border-color:var(--bad)}
+.lb-like-btn.liked{color:var(--bad);border-color:var(--bad);background:rgba(255,82,82,.08)}
+.lb-like-btn .heart{font-size:12px;line-height:1;display:inline-block}
+.lb-like-btn.liked .heart{animation:heart-pop .35s ease}
+@keyframes heart-pop{0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(1)}}
+
+.profile-like-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;margin-top:8px;
+  border:1px solid var(--border-2);background:var(--panel);
+  color:var(--text-2);font-family:inherit;font-size:13px;
+  cursor:pointer;border-radius:999px;transition:all .15s;
+}
+.profile-like-btn:hover{color:var(--bad);border-color:var(--bad)}
+.profile-like-btn.liked{color:var(--bad);border-color:var(--bad);background:rgba(255,82,82,.08)}
+.profile-like-btn .heart{font-size:16px;line-height:1}
+.profile-like-self{
+.profile-header .profile-like-btn,
+.profile-header .profile-like-self{margin-top:0;align-self:center}
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;margin-top:8px;color:var(--bad);font-size:13px;
+  border:1px dashed var(--border-2);border-radius:999px;
+}
 :root{
   --bg:#0a0a0a;--panel:#111;--panel-2:#0d0d0d;--panel-3:#1a1a1a;
   --border:#1e1e1e;--border-2:#262626;
@@ -480,7 +511,7 @@ html[data-skin="day"] .summary-locked{border-color:#f5d8b0;background:#fff7ea}
 .profile-history-item .ph-mob{font-size:9px;padding:1px 6px;border:1px solid var(--accent-dark);color:var(--accent);background:var(--accent-soft);letter-spacing:.04em;margin-left:8px}
 .radar-wrap{background:var(--panel-2);border:1px solid var(--border);padding:12px;margin-bottom:20px;display:flex;justify-content:center}
 .radar-svg{width:100%;max-width:360px;height:auto}
-.radar-axis-label{font-size:9px;fill:var(--text-4);font-family:inherit}
+.radar-axis-label{font-size:12px;fill:var(--text-2);font-family:inherit;font-weight:600}
 .radar-axis-line{stroke:var(--border);stroke-width:1}
 .radar-ring{fill:none;stroke:var(--border);stroke-width:1}
 .radar-poly{fill:var(--accent);fill-opacity:.15;stroke:var(--accent);stroke-width:2}
@@ -532,6 +563,12 @@ html[data-skin="day"] .summary-locked{border-color:#f5d8b0;background:#fff7ea}
 .lb-admin-row .actions{display:flex;gap:4px;justify-content:flex-end}
 .lb-admin-row .actions .btn-sm{padding:4px 8px;font-size:10px}
 .toast{display:inline-flex;align-items:center;background:var(--accent-soft);border:1px solid var(--accent);color:var(--accent);padding:0 14px;height:38px;font-size:12px;line-height:1;white-space:nowrap;transition:opacity .3s ease;border-radius:6px;margin-right:4px}
+#lbToastHost .toast{
+  height:24px;padding:0 10px;font-size:11px;
+  background:rgba(255,82,82,.12);
+  border-color:var(--bad);color:var(--bad);
+  margin:0;border-radius:4px;
+}
 @media(max-width:700px){
 body{padding:12px 8px;font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif}
 html[data-skin="a"] body,html[data-skin="b"] body,html[data-skin="d"] body{font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif}
@@ -803,6 +840,8 @@ var I18N={
     adminBadge:'以管理员身份登录',adminNameLabel:'管理员名字',adminNamePh:'例如: ADMIN',
     adminPwdLabel:'管理员密码',adminPwdPh:'请输入管理员密码',btnAdminLogin:'管理员登录',
     adminHint:'此入口仅供管理员使用<br>普通用户请使用左侧「普通用户」入口',
+radarReaction:'反应',radarAim:'瞄准',radarSequence:'序列',radarNumber:'记忆',radarColor:'色觉',radarTyping:'打字',radarChase:'追踪',radarSound:'听觉',radarSchulte:'舒尔特',radarStroop:'色词',radarRhythm:'节奏',radarTime:'时间',radarGoNoGo:'抑制',radarNback:'N-back',radarMath:'心算',radarSpotDiff:'找异',
+statBest:'最佳',statAvg:'平均',statRounds:'局数',statRank:'等级',
 changelogBtn:'更新日志',changelogTitle:'更新日志',changelogEmpty:'暂无更新记录',changelogLoading:'加载中...',themeDark:'主题',themeLight:'主题',logout:'登出',feedbackBtn:'反馈',    sectionTests:'测试项目',btnQuit:'退出测试',
     unitPt:'分',unitItem:'项',unitMin:'分钟',
     tagUntested:'未测',tagValid:'有效',tagExpired:'已过期',weight:'权重',
@@ -874,6 +913,8 @@ changelogBtn:'更新日志',changelogTitle:'更新日志',changelogEmpty:'暂无
     adminBadge:'Administrator Login',adminNameLabel:'Admin name',adminNamePh:'e.g. ADMIN',
     adminPwdLabel:'Admin password',adminPwdPh:'Enter admin password',btnAdminLogin:'Admin Login',
     adminHint:'This entry is for administrators only.<br>Regular users please use the user entry.',
+radarReaction:'React',radarAim:'Aim',radarSequence:'Seq',radarNumber:'Num',radarColor:'Color',radarTyping:'Type',radarChase:'Track',radarSound:'Sound',radarSchulte:'Schulte',radarStroop:'Stroop',radarRhythm:'Rhythm',radarTime:'Time',radarGoNoGo:'Inhibit',radarNback:'N-back',radarMath:'Math',radarSpotDiff:'Spot',
+statBest:'BEST',statAvg:'AVG',statRounds:'ROUNDS',statRank:'RANK',
 changelogBtn:'Changelog',changelogTitle:'Changelog',changelogEmpty:'No entries yet',changelogLoading:'Loading...',themeDark:'Theme',themeLight:'Theme',logout:'Logout',feedbackBtn:'Feedback',
     sectionTests:'Test Items',btnQuit:'Quit Test',
     unitPt:' pts',unitItem:'',unitMin:' min',
@@ -946,6 +987,8 @@ changelogBtn:'Changelog',changelogTitle:'Changelog',changelogEmpty:'No entries y
     adminBadge:'管理者ログイン',adminNameLabel:'管理者名',adminNamePh:'例: ADMIN',
     adminPwdLabel:'管理者パスワード',adminPwdPh:'管理者パスワードを入力',btnAdminLogin:'管理者ログイン',
     adminHint:'この入口は管理者専用です。<br>一般ユーザーはユーザー入口をご利用ください。',
+radarReaction:'反応',radarAim:'エイム',radarSequence:'順序',radarNumber:'数字',radarColor:'色覚',radarTyping:'タイピング',radarChase:'追跡',radarSound:'聴覚',radarSchulte:'シャルテ',radarStroop:'ストループ',radarRhythm:'リズム',radarTime:'時間',radarGoNoGo:'抑制',radarNback:'Nバック',radarMath:'暗算',radarSpotDiff:'間違い',
+statBest:'最速',statAvg:'平均',statRounds:'回数',statRank:'ランク',
   changelogBtn:'更新履歴',changelogTitle:'更新履歴',changelogEmpty:'記録がありません',changelogLoading:'読み込み中...',themeDark:'テーマ',themeLight:'テーマ',logout:'ログアウト',feedbackBtn:'フィードバック',
     sectionTests:'テスト項目',btnQuit:'テストを終了',
     unitPt:'点',unitItem:'項目',unitMin:'分',
@@ -1018,6 +1061,8 @@ changelogBtn:'Changelog',changelogTitle:'Changelog',changelogEmpty:'No entries y
     adminBadge:'관리자 로그인',adminNameLabel:'관리자 이름',adminNamePh:'예: ADMIN',
     adminPwdLabel:'관리자 비밀번호',adminPwdPh:'관리자 비밀번호를 입력하세요',btnAdminLogin:'관리자 로그인',
     adminHint:'이 입구는 관리자 전용입니다.<br>일반 사용자는 사용자 입구를 이용하세요.',
+radarReaction:'반응',radarAim:'에임',radarSequence:'순서',radarNumber:'숫자',radarColor:'색각',radarTyping:'타이핑',radarChase:'추적',radarSound:'청각',radarSchulte:'슐테',radarStroop:'스트룹',radarRhythm:'리듬',radarTime:'시간',radarGoNoGo:'억제',radarNback:'N-back',radarMath:'암산',radarSpotDiff:'틀린곳',
+statBest:'최고',statAvg:'평균',statRounds:'횟수',statRank:'등급',
 changelogBtn:'업데이트',changelogTitle:'업데이트 내역',changelogEmpty:'기록이 없습니다',changelogLoading:'불러오는 중...',themeDark:'테마',themeLight:'테마',logout:'로그아웃',feedbackBtn:'피드백',
     sectionTests:'테스트 항목',btnQuit:'테스트 종료',
     unitPt:'점',unitItem:'개',unitMin:'분',
@@ -1240,18 +1285,25 @@ function escapeHtml(s){return String(s).replace(/[&<>"']/g,function(c){return {'
 function renderBrand(name){var p=String(name).split('.');if(p.length===2)return escapeHtml(p[0])+'<span class="dot">.</span>'+escapeHtml(p[1]);return escapeHtml(name);}
 function formatTs(ts){if(!ts)return '—';var d=new Date(ts);var pad=function(n,w){w=w||2;var s=String(n);while(s.length<w)s='0'+s;return s;};return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());}
 function formatTsShort(ts){if(!ts)return '—';var d=new Date(ts);var pad=function(n){return n<10?'0'+n:''+n;};return (d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());}
-function showToast(m,d){
+function showToast(m,d,targetId){
   var el=document.createElement('div');
   el.className='toast';
   el.textContent=m;
   el.style.opacity='0';
-  var btn=document.getElementById('btnSaveTotal');
-  if(btn&&btn.parentNode){
-    var old=btn.parentNode.querySelectorAll('.toast');
+  var host=null;
+  var anchor=null;
+  if(targetId) host=document.getElementById(targetId);
+  if(!host){
+    var btn=document.getElementById('btnSaveTotal');
+    if(btn&&btn.parentNode){ host=btn.parentNode; anchor=btn; }
+  }
+  if(host){
+    var old=host.querySelectorAll('.toast');
     for(var oi=0;oi<old.length;oi++){
       if(old[oi].parentNode)old[oi].parentNode.removeChild(old[oi]);
     }
-    btn.parentNode.insertBefore(el,btn);
+    if(anchor&&anchor.parentNode===host) host.insertBefore(el,anchor);
+    else host.appendChild(el);
   }else{
     var oldBody=document.body.querySelectorAll('.toast');
     for(var oj=0;oj<oldBody.length;oj++){
@@ -1527,6 +1579,7 @@ async function fetchCloudLeaderboard(){
     var res=await supabase.from('leaderboard').select('*').order('score',{ascending:false}).limit(CONFIG.maxLeaderboard);
     if(res.error){leaderboardBody.innerHTML='<div class="lb-empty">'+t('loadFailed')+escapeHtml(res.error.message)+'</div>';return;}
     cloudLeaderboardCache=res.data||[];
+    if(!likesLoaded){ await fetchLikes(); }
     try{
       var ures=await supabase.from('users').select('id,mouse,keyboard');
       if(ures.data){
@@ -1602,6 +1655,7 @@ function renderLbFilters(count){
     h+='<div class="lb-fdrop-item'+(LB_PROJECT_KEYS[m].k===lbProjectFilter?' active':'')+'" data-proj="'+LB_PROJECT_KEYS[m].k+'">'+t(LB_PROJECT_KEYS[m].label)+'</div>';
   }
   h+='</div></div>';
+h+='<span id="lbToastHost" style="display:inline-flex;align-items:center"></span>';
   h+='<div class="lb-fright">'+count+' '+t('unitPerson')+'</div>';
   el.innerHTML=h;
 
@@ -1699,9 +1753,13 @@ function renderLeaderboardHtml(groups,hid){
     var displayScore,displayRank,displayColor;
     if(lbProjectFilter==='total'){displayScore=latest.score;displayRank=latest.rank;displayColor=gradeColor(latest.rank);}
     else{displayScore=getProjectScore(latest,lbProjectFilter)||0;displayRank=getGrade(displayScore);displayColor=gradeColor(displayRank);}
+     var likeCnt=likesCache[g.userId]||0;
+    var liked=!!myLikesSet[g.userId];
+    var likeBtn='<button class="lb-like-btn'+(liked?' liked':'')+'" data-like-uid="'+escapeHtml(g.userId)+'" type="button"><span class="heart">♥</span><span class="like-cnt">'+likeCnt+'</span></button>';
     var line1='<div class="lb-line1">'+
       '<span class="lb-rank">#'+(index+1)+'</span>'+
       '<span class="lb-name">'+escapeHtml(g.name)+star+'<span class="uid">#'+escapeHtml(g.userId)+'</span>'+(cnt>1?'<span class="cnt">'+cnt+t('timesSuffix')+'</span>':'')+(isMob?'<span class="lb-mob">移动端</span>':'')+'</span>'+
+      likeBtn+
       (gear?'<span class="lb-gear">'+escapeHtml(gear)+'</span>':'')+
       '<span class="lb-latest"><span class="tag">'+t('lbLatest')+'</span>'+latestItems.join('')+'<span class="lb-grade" style="color:'+displayColor+'">'+escapeHtml(displayRank)+'</span><span class="lb-score" style="color:'+scoreColor+'">'+displayScore+'<i>'+t('unitPt')+'</i></span></span>'+
     '</div>';
@@ -1749,6 +1807,13 @@ lbRefreshBtn.addEventListener('click',function(e){
   fetchCloudLeaderboard().then(function(){setTimeout(function(){lbRefreshBtn.classList.remove('spinning');},400);});
 });
 leaderboardBody.addEventListener('click',function(e){
+var likeEl = e.target.closest ? e.target.closest('.lb-like-btn') : null;
+  if (likeEl) {
+    e.stopPropagation();
+    var luid = likeEl.getAttribute('data-like-uid');
+    if (luid) toggleLike(luid);
+    return;
+  }
   var nameEl=e.target.closest?e.target.closest('.lb-name'):null;
   if(nameEl){var rowFromName=nameEl.closest('.lb-row');if(rowFromName){var openUid=rowFromName.getAttribute('data-uid');if(openUid){openProfile(openUid);return;}}}
   var row=e.target.closest?e.target.closest('.lb-row'):null;
@@ -1759,7 +1824,83 @@ leaderboardBody.addEventListener('click',function(e){
   saveExpandedCache();
   refreshLeaderboardDisplay();
 });
+/* ============================================================
+   点赞系统
+   ============================================================ */
+var likesCache = {};
+var myLikesSet = {};
+var likesLoaded = false;
 
+async function fetchLikes(){
+  try{
+    var res = await supabase.from('likes').select('from_user_id,to_user_id');
+    if(res.error){ likesLoaded = true; return; }
+    var data = res.data || [];
+    likesCache = {};
+    myLikesSet = {};
+    var myId = currentUser ? currentUser.id : null;
+    for(var i=0;i<data.length;i++){
+      var l = data[i];
+      likesCache[l.to_user_id] = (likesCache[l.to_user_id]||0)+1;
+      if(myId && l.from_user_id===myId) myLikesSet[l.to_user_id] = true;
+    }
+    likesLoaded = true;
+  }catch(e){ likesLoaded = true; }
+}
+
+function updateLikeButtons(uid){
+  var cnt = likesCache[uid]||0;
+  var liked = !!myLikesSet[uid];
+  var btns = document.querySelectorAll('[data-like-uid="'+uid+'"]');
+  for(var i=0;i<btns.length;i++){
+    if(liked) btns[i].classList.add('liked');
+    else btns[i].classList.remove('liked');
+    var c = btns[i].querySelector('.like-cnt');
+    if(c) c.textContent = cnt;
+    var h = btns[i].querySelector('.heart');
+    if(h && liked){ h.style.animation='none'; void h.offsetWidth; h.style.animation=''; }
+  }
+}
+
+async function toggleLike(targetUserId){
+  var host = document.getElementById('lbToastHost') ? 'lbToastHost' : null;
+  if(!currentUser){ showToast(t('msgNeedLogin'),1800,host); return; }
+  if(targetUserId===currentUser.id){ showToast('不能给自己点赞',1800,host); return; }
+
+  var already = !!myLikesSet[targetUserId];
+  if(already){
+    delete myLikesSet[targetUserId];
+    likesCache[targetUserId] = Math.max(0,(likesCache[targetUserId]||1)-1);
+  }else{
+    myLikesSet[targetUserId] = true;
+    likesCache[targetUserId] = (likesCache[targetUserId]||0)+1;
+    if(typeof playBeep==='function') playBeep(900,0.05,'sine',0.06);
+  }
+  updateLikeButtons(targetUserId);
+
+  try{
+    if(already){
+      var r = await supabase.from('likes').delete()
+        .eq('from_user_id',currentUser.id).eq('to_user_id',targetUserId);
+      if(r.error) throw r.error;
+    }else{
+      var r2 = await supabase.from('likes').insert([{
+        from_user_id: currentUser.id, to_user_id: targetUserId, ts: Date.now()
+      }]);
+      if(r2.error) throw r2.error;
+    }
+  }catch(e){
+    if(already){
+      myLikesSet[targetUserId] = true;
+      likesCache[targetUserId] = (likesCache[targetUserId]||0)+1;
+    }else{
+      delete myLikesSet[targetUserId];
+      likesCache[targetUserId] = Math.max(0,(likesCache[targetUserId]||1)-1);
+    }
+    updateLikeButtons(targetUserId);
+    showToast(t('msgNetErr')+(e.message||e),1800,host);
+  }
+}
 /* ============================================================
    会话
    ============================================================ */
@@ -2895,12 +3036,12 @@ async function openProfile(userId){
 }
 function buildRadarSvg(latest){
   var keys=['reaction','aim','sequence','number','color','typing','chase','sound','schulte','stroop','rhythm','timePerception','goNoGo','nback','math','spotDiff'];
-  var labels={reaction:'反应',aim:'瞄准',sequence:'序列',number:'记忆',color:'色觉',typing:'打字',chase:'追踪',sound:'听觉',schulte:'舒尔特',stroop:'抑制',rhythm:'节奏',timePerception:'时间',goNoGo:'GoNogo',nback:'N-back',math:'心算',spotDiff:'找异'};
+var labels={reaction:t('radarReaction'),aim:t('radarAim'),sequence:t('radarSequence'),number:t('radarNumber'),color:t('radarColor'),typing:t('radarTyping'),chase:t('radarChase'),sound:t('radarSound'),schulte:t('radarSchulte'),stroop:t('radarStroop'),rhythm:t('radarRhythm'),timePerception:t('radarTime'),goNoGo:t('radarGoNoGo'),nback:t('radarNback'),math:t('radarMath'),spotDiff:t('radarSpotDiff')};
   var N=keys.length;
   var cx=180,cy=170,r=130;
   var vals=keys.map(function(k){var v=getProjectScore(latest,k);return v===null?0:v;});
   var angleStep=(Math.PI*2)/N;
-  var h='<svg class="radar-svg" viewBox="0 0 360 340">';
+  var h='<svg class="radar-svg" viewBox="0 0 360 360">';
   for(var ring=1;ring<=4;ring++){
     var rr=r*ring/4;var pts=[];
     for(var i=0;i<N;i++){var ang=-Math.PI/2+i*angleStep;pts.push((cx+Math.cos(ang)*rr).toFixed(1)+','+(cy+Math.sin(ang)*rr).toFixed(1));}
@@ -2909,7 +3050,7 @@ function buildRadarSvg(latest){
   for(var i2=0;i2<N;i2++){
     var a=-Math.PI/2+i2*angleStep;
     h+='<line class="radar-axis-line" x1="'+cx+'" y1="'+cy+'" x2="'+(cx+Math.cos(a)*r).toFixed(1)+'" y2="'+(cy+Math.sin(a)*r).toFixed(1)+'"/>';
-    var lx=cx+Math.cos(a)*(r+16);var ly=cy+Math.sin(a)*(r+16);
+    var lx=cx+Math.cos(a)*(r+22);var ly=cy+Math.sin(a)*(r+22);
     h+='<text class="radar-axis-label" x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle" dominant-baseline="middle">'+labels[keys[i2]]+'</text>';
   }
   var polyPts=[];
@@ -2959,8 +3100,18 @@ function renderProfile(userInfo,scores,isSelf,editing){
   var best=0,avg=0,rounds=scores.length;
   if(scores.length>0){best=scores[0].score;var sum=0;for(var i=0;i<scores.length;i++)sum+=scores[i].score;avg=Math.round(sum/scores.length);}
   var rankText=best>0?getGrade(best):'—';
-  var headerHtml='<div class="profile-header"><div>'+(editing?'<input type="text" class="profile-edit-input" id="prof_name" maxlength="16" value="'+nameEsc+'" placeholder="'+t('pfName')+'">':'<div class="profile-name">'+nameEsc+(isAdmin?'<span style="color:var(--purple)"> ★</span>':'')+'</div>')+'<div class="profile-id">#'+idEsc+(isAdmin?' · '+t('pfAdmin'):'')+'</div></div><button class="profile-close" id="btnCloseProfile" type="button">'+t('pfClose')+'</button></div>';
-  var statsHtml='<div class="profile-stats"><div class="profile-stat"><div class="profile-stat-label">BEST</div><div class="profile-stat-value hl">'+best+'</div></div><div class="profile-stat"><div class="profile-stat-label">AVG</div><div class="profile-stat-value">'+avg+'</div></div><div class="profile-stat"><div class="profile-stat-label">ROUNDS</div><div class="profile-stat-value">'+rounds+'</div></div><div class="profile-stat"><div class="profile-stat-label">RANK</div><div class="profile-stat-value" style="color:'+gradeColor(rankText)+'">'+rankText+'</div></div></div>';
+var likeCnt=likesCache[userInfo.id]||0;
+  var liked=!!myLikesSet[userInfo.id];
+  var likeHtml='';
+  if(!editing){
+    if(isSelf){
+      likeHtml='<div class="profile-like-self"><span class="heart">♥</span><span class="like-cnt">'+likeCnt+'</span> 收到赞</div>';
+    }else{
+      likeHtml='<button class="profile-like-btn'+(liked?' liked':'')+'" data-like-uid="'+escapeHtml(userInfo.id)+'" id="profLikeBtn" type="button"><span class="heart">♥</span><span class="like-cnt">'+likeCnt+'</span></button>';
+    }
+  }
+  var statsHtml='<div class="profile-stats"><div class="profile-stat"><div class="profile-stat-label">'+t('statBest')+'</div><div class="profile-stat-value hl">'+best+'</div></div><div class="profile-stat"><div class="profile-stat-label">'+t('statAvg')+'</div><div class="profile-stat-value">'+avg+'</div></div><div class="profile-stat"><div class="profile-stat-label">'+t('statRounds')+'</div><div class="profile-stat-value">'+rounds+'</div></div><div class="profile-stat"><div class="profile-stat-label">'+t('statRank')+'</div><div class="profile-stat-value" style="color:'+gradeColor(rankText)+'">'+rankText+'</div></div></div>';
+   var headerHtml='<div class="profile-header"><div>'+(editing?'<input type="text" class="profile-edit-input" id="prof_name" maxlength="16" value="'+nameEsc+'" placeholder="'+t('pfName')+'">':'<div class="profile-name">'+nameEsc+(isAdmin?'<span style="color:var(--purple)"> ★</span>':'')+'</div>')+'<div class="profile-id">#'+idEsc+(isAdmin?' · '+t('pfAdmin'):'')+'</div></div>'+likeHtml+'</div>';
   var radarHtml='';
   if(scores.length>0){
     var latestRecord=scores[0];
@@ -3000,8 +3151,15 @@ function renderProfile(userInfo,scores,isSelf,editing){
     else if(scores.length>0){actionsHtml='<div class="profile-actions"><button class="btn btn-primary" id="btnProfileEdit" type="button">'+t('pfEdit')+'</button><button class="btn" id="btnProfileShare" type="button">'+t('pfShare')+'</button><button class="btn" id="btnProfileCSV" type="button">'+t('pfExport')+'</button></div>';}
     else{actionsHtml='<div class="profile-actions"><button class="btn btn-primary" id="btnProfileEdit" type="button">'+t('pfEdit')+'</button></div>';}
   }else if(scores.length>0){actionsHtml='<div class="profile-actions"><button class="btn" id="btnProfileShare" type="button">'+t('pfShare')+'</button></div>';}
-  modalBox.innerHTML='<div class="modal-title"><span>'+t('pfTitle')+'</span><span class="modal-sub">'+(isSelf?'EDITABLE':'VIEW ONLY')+'</span></div>'+headerHtml+statsHtml+radarHtml+growthHtml+bioHtml+gearHtml+histHtml+actionsHtml;
+modalBox.innerHTML='<div class="modal-title"><span>'+t('pfTitle')+'</span><button class="profile-close" id="btnCloseProfile" type="button">'+t('pfClose')+'</button></div>'+headerHtml+statsHtml+radarHtml+growthHtml+bioHtml+gearHtml+histHtml+actionsHtml;
   document.getElementById('btnCloseProfile').addEventListener('click',closeModal);
+  var profLikeBtn=document.getElementById('profLikeBtn');
+  if(profLikeBtn){
+    profLikeBtn.addEventListener('click',function(e){
+      e.stopPropagation();
+      toggleLike(userInfo.id);
+    });
+  }
   var shareBtn=document.getElementById('btnProfileShare');
   if(shareBtn)shareBtn.addEventListener('click',function(){generateShareCard(userInfo,scores);});
   var csvBtn=document.getElementById('btnProfileCSV');
@@ -3105,7 +3263,7 @@ function generateShareCard(userInfo,scores){
   ctx.fillText('#'+(userInfo.id||''),nameX,avatarCy+18);
   ctx.strokeStyle=c.border;ctx.beginPath();ctx.moveTo(36,218);ctx.lineTo(W-36,218);ctx.stroke();
   var radarKeys=['reaction','aim','sequence','number','color','typing','chase','sound','schulte','stroop','rhythm','timePerception','goNoGo','nback','math','spotDiff'];
-  var radarLabels=['反','瞄','序','记','色','打','追','听','舒','抑','节','时','GNG','NB','算','找'];
+ var radarLabels=[t('radarReaction'),t('radarAim'),t('radarSequence'),t('radarNumber'),t('radarColor'),t('radarTyping'),t('radarChase'),t('radarSound'),t('radarSchulte'),t('radarStroop'),t('radarRhythm'),t('radarTime'),t('radarGoNoGo'),t('radarNback'),t('radarMath'),t('radarSpotDiff')];
   var radarVals=radarKeys.map(function(kk){var v=getProjectScore(best,kk);return v===null?0:v;});
   drawRadarOnCanvas(ctx,190,354,100,radarVals,radarLabels,c.accent,c.text3,c.border);
   ctx.textAlign='right';ctx.fillStyle=c.grade;ctx.font='700 96px "JetBrains Mono", monospace';
